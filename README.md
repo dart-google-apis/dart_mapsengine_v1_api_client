@@ -4,7 +4,7 @@
 
 Auto-generated client library for accessing the mapsengine v1 API.
 
-#### ![Logo](http://www.google.com/images/icons/product/search-16.gif) Google Maps Engine API - mapsengine v1
+#### ![Logo](http://www.google.com/images/icons/product/maps_engine-16.png) Google Maps Engine API - mapsengine v1
 
 The Google Maps Engine API allows developers to store and query geospatial vector and raster data.
 
@@ -14,7 +14,7 @@ Adding dependency to pubspec.yaml
 
 ```
   dependencies:
-    google_mapsengine_v1_api: '>=0.4.0'
+    google_mapsengine_v1_api: '>=0.4.1'
 ```
 
 For web applications:

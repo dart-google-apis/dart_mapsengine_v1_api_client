@@ -17,7 +17,7 @@ class AssetsResource_ {
    *
    * [optParams] - Additional query parameters
    */
-  async.Future<Resource> get(core.String id, {core.Map optParams}) {
+  async.Future<Asset> get(core.String id, {core.Map optParams}) {
     var url = "assets/{id}";
     var urlParams = new core.Map();
     var queryParams = new core.Map();
@@ -40,7 +40,7 @@ class AssetsResource_ {
     var response;
     response = _client.request(url, "GET", urlParams: urlParams, queryParams: queryParams);
     return response
-      .then((data) => new Resource.fromJson(data));
+      .then((data) => new Asset.fromJson(data));
   }
 
   /**
@@ -73,7 +73,7 @@ class AssetsResource_ {
    *
    * [optParams] - Additional query parameters
    */
-  async.Future<ResourcesListResponse> list({core.String bbox, core.String createdAfter, core.String createdBefore, core.String creatorEmail, core.int maxResults, core.String modifiedAfter, core.String modifiedBefore, core.String pageToken, core.String projectId, core.String type, core.Map optParams}) {
+  async.Future<AssetsListResponse> list({core.String bbox, core.String createdAfter, core.String createdBefore, core.String creatorEmail, core.int maxResults, core.String modifiedAfter, core.String modifiedBefore, core.String pageToken, core.String projectId, core.String type, core.Map optParams}) {
     var url = "assets";
     var urlParams = new core.Map();
     var queryParams = new core.Map();
@@ -107,7 +107,7 @@ class AssetsResource_ {
     var response;
     response = _client.request(url, "GET", urlParams: urlParams, queryParams: queryParams);
     return response
-      .then((data) => new ResourcesListResponse.fromJson(data));
+      .then((data) => new AssetsListResponse.fromJson(data));
   }
 }
 
@@ -169,12 +169,47 @@ class LayersResource_ {
       parents = new LayersParentsResource_(client);
 
   /**
+   * Create a layer asset.
+   *
+   * [request] - Layer to send in this request
+   *
+   * [process] - Whether to queue the created layer for processing.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<Layer> create(Layer request, {core.bool process, core.Map optParams}) {
+    var url = "layers";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (process != null) queryParams["process"] = process;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "POST", body: request.toString(), urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new Layer.fromJson(data));
+  }
+
+  /**
    * Return metadata for a particular layer.
    *
    * [id] - The ID of the layer.
    *
    * [version]
    *   Allowed values:
+   *     draft - The draft version.
    *     published - The published version.
    *
    * [optParams] - Additional query parameters
@@ -187,8 +222,8 @@ class LayersResource_ {
     var paramErrors = new core.List();
     if (id == null) paramErrors.add("id is required");
     if (id != null) urlParams["id"] = id;
-    if (version != null && !["published"].contains(version)) {
-      paramErrors.add("Allowed values for version: published");
+    if (version != null && !["draft", "published"].contains(version)) {
+      paramErrors.add("Allowed values for version: draft, published");
     }
     if (version != null) queryParams["version"] = version;
     if (optParams != null) {
@@ -264,6 +299,72 @@ class LayersResource_ {
     return response
       .then((data) => new LayersListResponse.fromJson(data));
   }
+
+  /**
+   * Process a layer asset.
+   *
+   * [id] - The ID of the layer.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<ProcessResponse> process(core.String id, {core.Map optParams}) {
+    var url = "layers/{id}/process";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "POST", urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new ProcessResponse.fromJson(data));
+  }
+
+  /**
+   * Publish a layer asset.
+   *
+   * [id] - The ID of the layer.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<PublishResponse> publish(core.String id, {core.Map optParams}) {
+    var url = "layers/{id}/publish";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "POST", urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new PublishResponse.fromJson(data));
+  }
 }
 
 class LayersParentsResource_ {
@@ -321,12 +422,44 @@ class MapsResource_ {
       _client = client;
 
   /**
+   * Create a map asset.
+   *
+   * [request] - Map to send in this request
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<Map> create(Map request, {core.Map optParams}) {
+    var url = "maps";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "POST", body: request.toString(), urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new Map.fromJson(data));
+  }
+
+  /**
    * Return metadata for a particular map.
    *
    * [id] - The ID of the map.
    *
    * [version]
    *   Allowed values:
+   *     draft - The draft version.
    *     published - The published version.
    *
    * [optParams] - Additional query parameters
@@ -339,8 +472,8 @@ class MapsResource_ {
     var paramErrors = new core.List();
     if (id == null) paramErrors.add("id is required");
     if (id != null) urlParams["id"] = id;
-    if (version != null && !["published"].contains(version)) {
-      paramErrors.add("Allowed values for version: published");
+    if (version != null && !["draft", "published"].contains(version)) {
+      paramErrors.add("Allowed values for version: draft, published");
     }
     if (version != null) queryParams["version"] = version;
     if (optParams != null) {
@@ -416,6 +549,39 @@ class MapsResource_ {
     return response
       .then((data) => new MapsListResponse.fromJson(data));
   }
+
+  /**
+   * Publish a map asset.
+   *
+   * [id] - The ID of the map.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<PublishResponse> publish(core.String id, {core.Map optParams}) {
+    var url = "maps/{id}/publish";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "POST", urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new PublishResponse.fromJson(data));
+  }
 }
 
 class ProjectsResource_ {
@@ -466,6 +632,37 @@ class RasterCollectionsResource_ {
       _client = client,
       parents = new RasterCollectionsParentsResource_(client),
       rasters = new RasterCollectionsRastersResource_(client);
+
+  /**
+   * Create a raster collection asset.
+   *
+   * [request] - RasterCollection to send in this request
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<RasterCollection> create(RasterCollection request, {core.Map optParams}) {
+    var url = "rasterCollections";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "POST", body: request.toString(), urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new RasterCollection.fromJson(data));
+  }
 
   /**
    * Return metadata for a particular raster collection.
@@ -555,6 +752,39 @@ class RasterCollectionsResource_ {
     return response
       .then((data) => new RastercollectionsListResponse.fromJson(data));
   }
+
+  /**
+   * Process a raster collection asset.
+   *
+   * [id] - The ID of the raster collection.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<ProcessResponse> process(core.String id, {core.Map optParams}) {
+    var url = "rasterCollections/{id}/process";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "POST", urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new ProcessResponse.fromJson(data));
+  }
 }
 
 class RasterCollectionsParentsResource_ {
@@ -610,6 +840,80 @@ class RasterCollectionsRastersResource_ {
 
   RasterCollectionsRastersResource_(Client client) :
       _client = client;
+
+  /**
+   * Remove rasters from an existing raster collection.
+
+Up to 50 rasters can be included in a single batchDelete request. Each batchDelete request is atomic.
+   *
+   * [request] - RasterCollectionsRasterBatchDeleteRequest to send in this request
+   *
+   * [id] - The ID of the raster collection to which these rasters belong.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<RasterCollectionsRastersBatchDeleteResponse> batchDelete(RasterCollectionsRasterBatchDeleteRequest request, core.String id, {core.Map optParams}) {
+    var url = "rasterCollections/{id}/rasters/batchDelete";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "POST", body: request.toString(), urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new RasterCollectionsRastersBatchDeleteResponse.fromJson(data));
+  }
+
+  /**
+   * Add rasters to an existing raster collection. Rasters must be successfully processed in order to be added to a raster collection.
+
+Up to 50 rasters can be included in a single batchInsert request. Each batchInsert request is atomic.
+   *
+   * [request] - RasterCollectionsRastersBatchInsertRequest to send in this request
+   *
+   * [id] - The ID of the raster collection to which these rasters belong.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<RasterCollectionsRastersBatchInsertResponse> batchInsert(RasterCollectionsRastersBatchInsertRequest request, core.String id, {core.Map optParams}) {
+    var url = "rasterCollections/{id}/rasters/batchInsert";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "POST", body: request.toString(), urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new RasterCollectionsRastersBatchInsertResponse.fromJson(data));
+  }
 
   /**
    * Return all rasters within a raster collection.
@@ -898,6 +1202,7 @@ class TablesResource_ {
    *
    * [version]
    *   Allowed values:
+   *     draft - The draft version.
    *     published - The published version.
    *
    * [optParams] - Additional query parameters
@@ -910,8 +1215,8 @@ class TablesResource_ {
     var paramErrors = new core.List();
     if (id == null) paramErrors.add("id is required");
     if (id != null) urlParams["id"] = id;
-    if (version != null && !["published"].contains(version)) {
-      paramErrors.add("Allowed values for version: published");
+    if (version != null && !["draft", "published"].contains(version)) {
+      paramErrors.add("Allowed values for version: draft, published");
     }
     if (version != null) queryParams["version"] = version;
     if (optParams != null) {
@@ -1164,6 +1469,7 @@ For more information about updating features, read Updating features in the Goog
    *
    * [version] - The table version to access. See Accessing Public Data for information.
    *   Allowed values:
+   *     draft - The draft version.
    *     published - The published version.
    *
    * [optParams] - Additional query parameters
@@ -1179,8 +1485,8 @@ For more information about updating features, read Updating features in the Goog
     if (select != null) queryParams["select"] = select;
     if (tableId == null) paramErrors.add("tableId is required");
     if (tableId != null) urlParams["tableId"] = tableId;
-    if (version != null && !["published"].contains(version)) {
-      paramErrors.add("Allowed values for version: published");
+    if (version != null && !["draft", "published"].contains(version)) {
+      paramErrors.add("Allowed values for version: draft, published");
     }
     if (version != null) queryParams["version"] = version;
     if (optParams != null) {
@@ -1222,6 +1528,7 @@ For more information about updating features, read Updating features in the Goog
    *
    * [version] - The table version to access. See Accessing Public Data for information.
    *   Allowed values:
+   *     draft - The draft version.
    *     published - The published version.
    *
    * [where] - An SQL-like predicate used to filter results.
@@ -1243,8 +1550,8 @@ For more information about updating features, read Updating features in the Goog
     if (orderBy != null) queryParams["orderBy"] = orderBy;
     if (pageToken != null) queryParams["pageToken"] = pageToken;
     if (select != null) queryParams["select"] = select;
-    if (version != null && !["published"].contains(version)) {
-      paramErrors.add("Allowed values for version: published");
+    if (version != null && !["draft", "published"].contains(version)) {
+      paramErrors.add("Allowed values for version: draft, published");
     }
     if (version != null) queryParams["version"] = version;
     if (where != null) queryParams["where"] = where;
