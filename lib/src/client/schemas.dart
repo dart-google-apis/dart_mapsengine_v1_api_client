@@ -61,6 +61,9 @@ class Asset {
   /** The asset's description. */
   core.String description;
 
+  /** The ETag, used to refer to the current version of the asset. */
+  core.String etag;
+
   /** The asset's globally unique ID. */
   core.String id;
 
@@ -92,6 +95,9 @@ class Asset {
     }
     if (json.containsKey("description")) {
       description = json["description"];
+    }
+    if (json.containsKey("etag")) {
+      etag = json["etag"];
     }
     if (json.containsKey("id")) {
       id = json["id"];
@@ -128,6 +134,9 @@ class Asset {
     }
     if (description != null) {
       output["description"] = description;
+    }
+    if (etag != null) {
+      output["etag"] = etag;
     }
     if (id != null) {
       output["id"] = id;
@@ -306,6 +315,23 @@ class Datasource {
   }
 
   /** Return String representation of Datasource */
+  core.String toString() => JSON.encode(this.toJson());
+
+}
+
+class Datasources extends SchemaArray<Datasource> {
+
+  /** Create new Datasources from JSON data */
+  Datasources.fromJson(core.List json) {
+    innerList.addAll(json.map((item) => new Datasource.fromJson(item)).toList());
+  }
+
+  /** Create JSON Object for Datasources */
+  core.List toJson() {
+    return innerList.map((item) => item.toJson()).toList();
+  }
+
+  /** Return String representation of Datasources */
   core.String toString() => JSON.encode(this.toJson());
 
 }
@@ -501,10 +527,16 @@ class FeaturesBatchInsertRequest {
 
   core.List<Feature> features;
 
+  /** If true, the server will normalize feature geometries. It is assumed that the South Pole is exterior to any polygons given. See here for a list of normalizations. If false, the all feature geometries must be given already normalized. The points in all LinearRings must be listed in counter-clockwise order, and LinearRings may not intersect. */
+  core.bool normalizeGeometries;
+
   /** Create new FeaturesBatchInsertRequest from JSON data */
   FeaturesBatchInsertRequest.fromJson(core.Map json) {
     if (json.containsKey("features")) {
       features = json["features"].map((featuresItem) => new Feature.fromJson(featuresItem)).toList();
+    }
+    if (json.containsKey("normalizeGeometries")) {
+      normalizeGeometries = json["normalizeGeometries"];
     }
   }
 
@@ -514,6 +546,9 @@ class FeaturesBatchInsertRequest {
 
     if (features != null) {
       output["features"] = features.map((featuresItem) => featuresItem.toJson()).toList();
+    }
+    if (normalizeGeometries != null) {
+      output["normalizeGeometries"] = normalizeGeometries;
     }
 
     return output;
@@ -529,10 +564,16 @@ class FeaturesBatchPatchRequest {
 
   core.List<Feature> features;
 
+  /** If true, the server will normalize feature geometries. It is assumed that the South Pole is exterior to any polygons given. See here for a list of normalizations. If false, the all feature geometries must be given already normalized. The points in all LinearRings must be listed in counter-clockwise order, and LinearRings may not intersect. */
+  core.bool normalizeGeometries;
+
   /** Create new FeaturesBatchPatchRequest from JSON data */
   FeaturesBatchPatchRequest.fromJson(core.Map json) {
     if (json.containsKey("features")) {
       features = json["features"].map((featuresItem) => new Feature.fromJson(featuresItem)).toList();
+    }
+    if (json.containsKey("normalizeGeometries")) {
+      normalizeGeometries = json["normalizeGeometries"];
     }
   }
 
@@ -542,6 +583,9 @@ class FeaturesBatchPatchRequest {
 
     if (features != null) {
       output["features"] = features.map((featuresItem) => featuresItem.toJson()).toList();
+    }
+    if (normalizeGeometries != null) {
+      output["normalizeGeometries"] = normalizeGeometries;
     }
 
     return output;
@@ -1037,6 +1081,53 @@ class GeoJsonProperties extends SchemaAnyObject {
 
 }
 
+/** An icon is a user-uploaded image that can be used to style point geometries. */
+class Icon {
+
+  /** The description of this Icon, supplied by the author. */
+  core.String description;
+
+  /** An ID used to refer to this Icon. */
+  core.String id;
+
+  /** The name of this Icon, supplied by the author. */
+  core.String name;
+
+  /** Create new Icon from JSON data */
+  Icon.fromJson(core.Map json) {
+    if (json.containsKey("description")) {
+      description = json["description"];
+    }
+    if (json.containsKey("id")) {
+      id = json["id"];
+    }
+    if (json.containsKey("name")) {
+      name = json["name"];
+    }
+  }
+
+  /** Create JSON Object for Icon */
+  core.Map toJson() {
+    var output = new core.Map();
+
+    if (description != null) {
+      output["description"] = description;
+    }
+    if (id != null) {
+      output["id"] = id;
+    }
+    if (name != null) {
+      output["name"] = name;
+    }
+
+    return output;
+  }
+
+  /** Return String representation of Icon */
+  core.String toString() => JSON.encode(this.toJson());
+
+}
+
 /** Style for icon, this is part of point style. */
 class IconStyle {
 
@@ -1046,6 +1137,12 @@ class IconStyle {
   /** Stock icon name. To use a stock icon, prefix it with 'gx_'. See Stock icon names for valid icon names. For example, to specify small_red, set name to 'gx_small_red'. */
   core.String name;
 
+  /** A scalable shape. */
+  ScaledShape scaledShape;
+
+  /** The function used to scale shapes. Required when a scaledShape is specified. */
+  ScalingFunction scalingFunction;
+
   /** Create new IconStyle from JSON data */
   IconStyle.fromJson(core.Map json) {
     if (json.containsKey("id")) {
@@ -1053,6 +1150,12 @@ class IconStyle {
     }
     if (json.containsKey("name")) {
       name = json["name"];
+    }
+    if (json.containsKey("scaledShape")) {
+      scaledShape = new ScaledShape.fromJson(json["scaledShape"]);
+    }
+    if (json.containsKey("scalingFunction")) {
+      scalingFunction = new ScalingFunction.fromJson(json["scalingFunction"]);
     }
   }
 
@@ -1066,6 +1169,12 @@ class IconStyle {
     if (name != null) {
       output["name"] = name;
     }
+    if (scaledShape != null) {
+      output["scaledShape"] = scaledShape.toJson();
+    }
+    if (scalingFunction != null) {
+      output["scalingFunction"] = scalingFunction.toJson();
+    }
 
     return output;
   }
@@ -1075,157 +1184,40 @@ class IconStyle {
 
 }
 
-/** A geo-referenced raster. */
-class Image {
+/** The response returned by a call to icons.List. */
+class IconsListResponse {
 
-  /** The acquisition time of this Raster. */
-  AcquisitionTime acquisitionTime;
+  /** Resources returned. */
+  core.List<Icon> icons;
 
-  /** The name of the attribution to be used for this Raster. */
-  core.String attribution;
+  /** Next page token. */
+  core.String nextPageToken;
 
-  /** A rectangular bounding box which contains all of the data in this Raster. The numbers represent latitude and longitude in decimal degrees. */
-  core.List<core.num> bbox;
-
-  /** The creation time of this raster. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). */
-  core.String creationTime;
-
-  /** The description of this Raster, supplied by the author. */
-  core.String description;
-
-  /** The Map Editors access list to share this Raster with. */
-  core.String draftAccessList;
-
-  /** The files associated with this Raster. */
-  core.List<File> files;
-
-  /** A globally unique ID, used to refer to this Raster. */
-  core.String id;
-
-  /** The last modified time of this raster. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). */
-  core.String lastModifiedTime;
-
-  /** The mask processing type of this Raster. */
-  core.String maskType;
-
-  /** The name of this Raster, supplied by the author. */
-  core.String name;
-
-  /** The processing status of this Raster. */
-  core.String processingStatus;
-
-  /** The ID of the project that this Raster is in. */
-  core.String projectId;
-
-  /** The type of this Raster. Always "image" today. */
-  core.String rasterType;
-
-  /** Tags of this Raster. */
-  core.List<core.String> tags;
-
-  /** Create new Image from JSON data */
-  Image.fromJson(core.Map json) {
-    if (json.containsKey("acquisitionTime")) {
-      acquisitionTime = new AcquisitionTime.fromJson(json["acquisitionTime"]);
+  /** Create new IconsListResponse from JSON data */
+  IconsListResponse.fromJson(core.Map json) {
+    if (json.containsKey("icons")) {
+      icons = json["icons"].map((iconsItem) => new Icon.fromJson(iconsItem)).toList();
     }
-    if (json.containsKey("attribution")) {
-      attribution = json["attribution"];
-    }
-    if (json.containsKey("bbox")) {
-      bbox = json["bbox"].toList();
-    }
-    if (json.containsKey("creationTime")) {
-      creationTime = json["creationTime"];
-    }
-    if (json.containsKey("description")) {
-      description = json["description"];
-    }
-    if (json.containsKey("draftAccessList")) {
-      draftAccessList = json["draftAccessList"];
-    }
-    if (json.containsKey("files")) {
-      files = json["files"].map((filesItem) => new File.fromJson(filesItem)).toList();
-    }
-    if (json.containsKey("id")) {
-      id = json["id"];
-    }
-    if (json.containsKey("lastModifiedTime")) {
-      lastModifiedTime = json["lastModifiedTime"];
-    }
-    if (json.containsKey("maskType")) {
-      maskType = json["maskType"];
-    }
-    if (json.containsKey("name")) {
-      name = json["name"];
-    }
-    if (json.containsKey("processingStatus")) {
-      processingStatus = json["processingStatus"];
-    }
-    if (json.containsKey("projectId")) {
-      projectId = json["projectId"];
-    }
-    if (json.containsKey("rasterType")) {
-      rasterType = json["rasterType"];
-    }
-    if (json.containsKey("tags")) {
-      tags = json["tags"].toList();
+    if (json.containsKey("nextPageToken")) {
+      nextPageToken = json["nextPageToken"];
     }
   }
 
-  /** Create JSON Object for Image */
+  /** Create JSON Object for IconsListResponse */
   core.Map toJson() {
     var output = new core.Map();
 
-    if (acquisitionTime != null) {
-      output["acquisitionTime"] = acquisitionTime.toJson();
+    if (icons != null) {
+      output["icons"] = icons.map((iconsItem) => iconsItem.toJson()).toList();
     }
-    if (attribution != null) {
-      output["attribution"] = attribution;
-    }
-    if (bbox != null) {
-      output["bbox"] = bbox.toList();
-    }
-    if (creationTime != null) {
-      output["creationTime"] = creationTime;
-    }
-    if (description != null) {
-      output["description"] = description;
-    }
-    if (draftAccessList != null) {
-      output["draftAccessList"] = draftAccessList;
-    }
-    if (files != null) {
-      output["files"] = files.map((filesItem) => filesItem.toJson()).toList();
-    }
-    if (id != null) {
-      output["id"] = id;
-    }
-    if (lastModifiedTime != null) {
-      output["lastModifiedTime"] = lastModifiedTime;
-    }
-    if (maskType != null) {
-      output["maskType"] = maskType;
-    }
-    if (name != null) {
-      output["name"] = name;
-    }
-    if (processingStatus != null) {
-      output["processingStatus"] = processingStatus;
-    }
-    if (projectId != null) {
-      output["projectId"] = projectId;
-    }
-    if (rasterType != null) {
-      output["rasterType"] = rasterType;
-    }
-    if (tags != null) {
-      output["tags"] = tags.toList();
+    if (nextPageToken != null) {
+      output["nextPageToken"] = nextPageToken;
     }
 
     return output;
   }
 
-  /** Return String representation of Image */
+  /** Return String representation of IconsListResponse */
   core.String toString() => JSON.encode(this.toJson());
 
 }
@@ -1313,6 +1305,24 @@ class LabelStyle {
 
 }
 
+/** A rectangular geographic bounds. */
+class LatLngBox extends SchemaArray<core.num> {
+
+  /** Create new LatLngBox from JSON data */
+  LatLngBox.fromJson(core.List json) {
+    innerList.addAll(json);
+  }
+
+  /** Create JSON Object for LatLngBox */
+  core.List toJson() {
+    return innerList;
+  }
+
+  /** Return String representation of LatLngBox */
+  core.String toString() => JSON.encode(this.toJson());
+
+}
+
 /** A Layer combines multiple datasources, with styling information, for presentation on a map. */
 class Layer {
 
@@ -1322,23 +1332,35 @@ class Layer {
   /** The creation time of this layer. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). */
   core.String creationTime;
 
-  /** The type of the datasources used to build this Layer. */
+  /** The email address of the creator of this layer. This is only returned on GET requests and not LIST requests. */
+  core.String creatorEmail;
+
+  /** Deprecated: The type of the datasources used to build this Layer. Note: This has been replaced by layerType, but is still available for now to maintain backward compatibility. */
   core.String datasourceType;
 
-  /** An array of datasources used to build this Layer. If datasourceType is "image", then each element in this array is a reference to an Image or RasterCollection. If datasourceType is "table" then each element in this array is a reference to a Vector Table. */
-  core.List<Datasource> datasources;
+  /** An array of datasources used to build this Layer. If layerType is "image", or layerType is not specified and datasourceType is "image", then each element in this array is a reference to an Image or RasterCollection. If layerType is "vector", or layerType is not specified and datasourceType is "table" then each element in this array is a reference to a Vector Table. */
+  Datasources datasources;
 
   /** The description of this Layer, supplied by the author. */
   core.String description;
 
-  /** The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Read About access lists in the Google Maps Engine help center for more information. */
+  /** Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. The API does not yet support the new permissions model. When you create a map via the API without specifying permissions, the account that created the map is the owner and has effective administrator access. Users can then use the Maps Engine user interface to adjust the permissions. This is a temporary workaround until the API supports the new permissions model. Read Add new users and groups in the Google Maps Engine help center for more information. */
   core.String draftAccessList;
+
+  /** The ETag, used to refer to the current version of the asset. */
+  core.String etag;
 
   /** A globally unique ID, used to refer to this Layer. */
   core.String id;
 
   /** The last modified time of this layer. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). */
   core.String lastModifiedTime;
+
+  /** The email address of the last modifier of this layer. This is only returned on GET requests and not LIST requests. */
+  core.String lastModifierEmail;
+
+  /** The type of the datasources used to build this Layer. This should be used instead of datasourceType. At least one of layerType and datasourceType and must be specified, but layerType takes precedence. */
+  core.String layerType;
 
   /** The name of this Layer, supplied by the author. */
   core.String name;
@@ -1349,14 +1371,17 @@ class Layer {
   /** The ID of the project that this Layer is in. */
   core.String projectId;
 
-  /** The access list to whom view permissions are granted. The value must be the name of a Maps Engine access list of the Map Viewer type, and the user must be a viewer on that list. Read About access lists in the Google Maps Engine help center for more information. */
+  /** Deprecated: The access list to whom view permissions are granted. The value must be the name of a Maps Engine access list of the Map Viewer type, and the user must be a viewer on that list. Read Share data, layers, and maps in the Google Maps Engine help center for more information. */
   core.String publishedAccessList;
+
+  /** The publishing status of this layer. */
+  core.String publishingStatus;
 
   /** The Styling information for a vector layer. */
   VectorStyle style;
 
   /** Tags of this Layer. */
-  core.List<core.String> tags;
+  Tags tags;
 
   /** Create new Layer from JSON data */
   Layer.fromJson(core.Map json) {
@@ -1366,11 +1391,14 @@ class Layer {
     if (json.containsKey("creationTime")) {
       creationTime = json["creationTime"];
     }
+    if (json.containsKey("creatorEmail")) {
+      creatorEmail = json["creatorEmail"];
+    }
     if (json.containsKey("datasourceType")) {
       datasourceType = json["datasourceType"];
     }
     if (json.containsKey("datasources")) {
-      datasources = json["datasources"].map((datasourcesItem) => new Datasource.fromJson(datasourcesItem)).toList();
+      datasources = new Datasources.fromJson(json["datasources"]);
     }
     if (json.containsKey("description")) {
       description = json["description"];
@@ -1378,11 +1406,20 @@ class Layer {
     if (json.containsKey("draftAccessList")) {
       draftAccessList = json["draftAccessList"];
     }
+    if (json.containsKey("etag")) {
+      etag = json["etag"];
+    }
     if (json.containsKey("id")) {
       id = json["id"];
     }
     if (json.containsKey("lastModifiedTime")) {
       lastModifiedTime = json["lastModifiedTime"];
+    }
+    if (json.containsKey("lastModifierEmail")) {
+      lastModifierEmail = json["lastModifierEmail"];
+    }
+    if (json.containsKey("layerType")) {
+      layerType = json["layerType"];
     }
     if (json.containsKey("name")) {
       name = json["name"];
@@ -1396,11 +1433,14 @@ class Layer {
     if (json.containsKey("publishedAccessList")) {
       publishedAccessList = json["publishedAccessList"];
     }
+    if (json.containsKey("publishingStatus")) {
+      publishingStatus = json["publishingStatus"];
+    }
     if (json.containsKey("style")) {
       style = new VectorStyle.fromJson(json["style"]);
     }
     if (json.containsKey("tags")) {
-      tags = json["tags"].toList();
+      tags = new Tags.fromJson(json["tags"]);
     }
   }
 
@@ -1414,11 +1454,14 @@ class Layer {
     if (creationTime != null) {
       output["creationTime"] = creationTime;
     }
+    if (creatorEmail != null) {
+      output["creatorEmail"] = creatorEmail;
+    }
     if (datasourceType != null) {
       output["datasourceType"] = datasourceType;
     }
     if (datasources != null) {
-      output["datasources"] = datasources.map((datasourcesItem) => datasourcesItem.toJson()).toList();
+      output["datasources"] = datasources.toJson();
     }
     if (description != null) {
       output["description"] = description;
@@ -1426,11 +1469,20 @@ class Layer {
     if (draftAccessList != null) {
       output["draftAccessList"] = draftAccessList;
     }
+    if (etag != null) {
+      output["etag"] = etag;
+    }
     if (id != null) {
       output["id"] = id;
     }
     if (lastModifiedTime != null) {
       output["lastModifiedTime"] = lastModifiedTime;
+    }
+    if (lastModifierEmail != null) {
+      output["lastModifierEmail"] = lastModifierEmail;
+    }
+    if (layerType != null) {
+      output["layerType"] = layerType;
     }
     if (name != null) {
       output["name"] = name;
@@ -1444,11 +1496,14 @@ class Layer {
     if (publishedAccessList != null) {
       output["publishedAccessList"] = publishedAccessList;
     }
+    if (publishingStatus != null) {
+      output["publishingStatus"] = publishingStatus;
+    }
     if (style != null) {
       output["style"] = style.toJson();
     }
     if (tags != null) {
-      output["tags"] = tags.toList();
+      output["tags"] = tags.toJson();
     }
 
     return output;
@@ -1607,19 +1662,25 @@ class Map {
   core.List<core.num> bbox;
 
   /** The contents of this Map. */
-  core.List<MapItem> contents;
+  MapContents contents;
 
   /** The creation time of this map. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). */
   core.String creationTime;
 
+  /** The email address of the creator of this map. This is only returned on GET requests and not LIST requests. */
+  core.String creatorEmail;
+
   /** An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees. */
-  core.List<core.num> defaultViewport;
+  LatLngBox defaultViewport;
 
   /** The description of this Map, supplied by the author. */
   core.String description;
 
-  /** The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Read About access lists in the Google Maps Engine help center for more information. */
+  /** Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. The API does not yet support the new permissions model. When you create a map via the API without specifying permissions, the account that created the map is the owner and has effective administrator access. Users can then use the Maps Engine user interface to adjust the permissions. This is a temporary workaround until the API supports the new permissions model. Read Add new users and groups in the Google Maps Engine help center for more information. */
   core.String draftAccessList;
+
+  /** The ETag, used to refer to the current version of the asset. */
+  core.String etag;
 
   /** A globally unique ID, used to refer to this Map. */
   core.String id;
@@ -1627,16 +1688,28 @@ class Map {
   /** The last modified time of this map. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). */
   core.String lastModifiedTime;
 
+  /** The email address of the last modifier of this map. This is only returned on GET requests and not LIST requests. */
+  core.String lastModifierEmail;
+
   /** The name of this Map, supplied by the author. */
   core.String name;
+
+  /** The processing status of this map. Map processing is automatically started once a map becomes ready for processing. */
+  core.String processingStatus;
 
   /** The ID of the project that this Map is in. */
   core.String projectId;
 
-  /** Tags of this Map. */
-  core.List<core.String> tags;
+  /** Deprecated: The access list to whom view permissions are granted. The value must be the name of a Maps Engine access list of the Map Viewer type, and the user must be a viewer on that list. Read Share data, layers, and maps in the Google Maps Engine help center for more information. */
+  core.String publishedAccessList;
 
-  /** An array containing the available versions of this Map. Currently may only contain "published". */
+  /** The publishing status of this map. */
+  core.String publishingStatus;
+
+  /** Tags of this Map. */
+  Tags tags;
+
+  /** Deprecated: An array containing the available versions of this Map. Currently may only contain "published". The publishingStatus field should be used instead. */
   core.List<core.String> versions;
 
   /** Create new Map from JSON data */
@@ -1645,13 +1718,16 @@ class Map {
       bbox = json["bbox"].toList();
     }
     if (json.containsKey("contents")) {
-      contents = json["contents"].map((contentsItem) => new MapItem.fromJson(contentsItem)).toList();
+      contents = new MapContents.fromJson(json["contents"]);
     }
     if (json.containsKey("creationTime")) {
       creationTime = json["creationTime"];
     }
+    if (json.containsKey("creatorEmail")) {
+      creatorEmail = json["creatorEmail"];
+    }
     if (json.containsKey("defaultViewport")) {
-      defaultViewport = json["defaultViewport"].toList();
+      defaultViewport = new LatLngBox.fromJson(json["defaultViewport"]);
     }
     if (json.containsKey("description")) {
       description = json["description"];
@@ -1659,20 +1735,35 @@ class Map {
     if (json.containsKey("draftAccessList")) {
       draftAccessList = json["draftAccessList"];
     }
+    if (json.containsKey("etag")) {
+      etag = json["etag"];
+    }
     if (json.containsKey("id")) {
       id = json["id"];
     }
     if (json.containsKey("lastModifiedTime")) {
       lastModifiedTime = json["lastModifiedTime"];
     }
+    if (json.containsKey("lastModifierEmail")) {
+      lastModifierEmail = json["lastModifierEmail"];
+    }
     if (json.containsKey("name")) {
       name = json["name"];
+    }
+    if (json.containsKey("processingStatus")) {
+      processingStatus = json["processingStatus"];
     }
     if (json.containsKey("projectId")) {
       projectId = json["projectId"];
     }
+    if (json.containsKey("publishedAccessList")) {
+      publishedAccessList = json["publishedAccessList"];
+    }
+    if (json.containsKey("publishingStatus")) {
+      publishingStatus = json["publishingStatus"];
+    }
     if (json.containsKey("tags")) {
-      tags = json["tags"].toList();
+      tags = new Tags.fromJson(json["tags"]);
     }
     if (json.containsKey("versions")) {
       versions = json["versions"].toList();
@@ -1687,13 +1778,16 @@ class Map {
       output["bbox"] = bbox.toList();
     }
     if (contents != null) {
-      output["contents"] = contents.map((contentsItem) => contentsItem.toJson()).toList();
+      output["contents"] = contents.toJson();
     }
     if (creationTime != null) {
       output["creationTime"] = creationTime;
     }
+    if (creatorEmail != null) {
+      output["creatorEmail"] = creatorEmail;
+    }
     if (defaultViewport != null) {
-      output["defaultViewport"] = defaultViewport.toList();
+      output["defaultViewport"] = defaultViewport.toJson();
     }
     if (description != null) {
       output["description"] = description;
@@ -1701,20 +1795,35 @@ class Map {
     if (draftAccessList != null) {
       output["draftAccessList"] = draftAccessList;
     }
+    if (etag != null) {
+      output["etag"] = etag;
+    }
     if (id != null) {
       output["id"] = id;
     }
     if (lastModifiedTime != null) {
       output["lastModifiedTime"] = lastModifiedTime;
     }
+    if (lastModifierEmail != null) {
+      output["lastModifierEmail"] = lastModifierEmail;
+    }
     if (name != null) {
       output["name"] = name;
+    }
+    if (processingStatus != null) {
+      output["processingStatus"] = processingStatus;
     }
     if (projectId != null) {
       output["projectId"] = projectId;
     }
+    if (publishedAccessList != null) {
+      output["publishedAccessList"] = publishedAccessList;
+    }
+    if (publishingStatus != null) {
+      output["publishingStatus"] = publishingStatus;
+    }
     if (tags != null) {
-      output["tags"] = tags.toList();
+      output["tags"] = tags.toJson();
     }
     if (versions != null) {
       output["versions"] = versions.toList();
@@ -1728,12 +1837,32 @@ class Map {
 
 }
 
+class MapContents extends SchemaArray<MapItem> {
+
+  /** Create new MapContents from JSON data */
+  MapContents.fromJson(core.List json) {
+    innerList.addAll(json.map((item) => new MapItem.fromJson(item)).toList());
+  }
+
+  /** Create JSON Object for MapContents */
+  core.List toJson() {
+    return innerList.map((item) => item.toJson()).toList();
+  }
+
+  /** Return String representation of MapContents */
+  core.String toString() => JSON.encode(this.toJson());
+
+}
+
 class MapFolder implements MapItem {
 
   core.List<MapItem> contents;
 
   /** An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees. */
   core.List<core.num> defaultViewport;
+
+  /** The expandability setting of this MapFolder. If true, the folder can be expanded. */
+  core.bool expandable;
 
   /** A user defined alias for this MapFolder, specific to this Map. */
   core.String key;
@@ -1754,6 +1883,9 @@ class MapFolder implements MapItem {
     }
     if (json.containsKey("defaultViewport")) {
       defaultViewport = json["defaultViewport"].toList();
+    }
+    if (json.containsKey("expandable")) {
+      expandable = json["expandable"];
     }
     if (json.containsKey("key")) {
       key = json["key"];
@@ -1778,6 +1910,9 @@ class MapFolder implements MapItem {
     }
     if (defaultViewport != null) {
       output["defaultViewport"] = defaultViewport.toList();
+    }
+    if (expandable != null) {
+      output["expandable"] = expandable;
     }
     if (key != null) {
       output["key"] = key;
@@ -2067,7 +2202,7 @@ class ParentsListResponse {
 /** Style for points. */
 class PointStyle {
 
-  /** Icon for the point; exactly one field in 'icon' must be set. */
+  /** Icon for the point; if it isn't null, exactly one of 'name', 'id' or 'scaledShape' must be set. */
   IconStyle icon;
 
   /** Label style for the point. */
@@ -2247,8 +2382,607 @@ class PublishResponse {
 
 }
 
-/** A raster resource. */
+/** The published version of a layer. */
+class PublishedLayer {
+
+  /** The description of this Layer, supplied by the author. */
+  core.String description;
+
+  /** A globally unique ID, used to refer to this Layer. */
+  core.String id;
+
+  /** The type of the datasources used to build this Layer. This should be used instead of datasourceType. At least one of layerType and datasourceType and must be specified, but layerType takes precedence. */
+  core.String layerType;
+
+  /** The name of this Layer, supplied by the author. */
+  core.String name;
+
+  /** The ID of the project that this Layer is in. */
+  core.String projectId;
+
+  /** Create new PublishedLayer from JSON data */
+  PublishedLayer.fromJson(core.Map json) {
+    if (json.containsKey("description")) {
+      description = json["description"];
+    }
+    if (json.containsKey("id")) {
+      id = json["id"];
+    }
+    if (json.containsKey("layerType")) {
+      layerType = json["layerType"];
+    }
+    if (json.containsKey("name")) {
+      name = json["name"];
+    }
+    if (json.containsKey("projectId")) {
+      projectId = json["projectId"];
+    }
+  }
+
+  /** Create JSON Object for PublishedLayer */
+  core.Map toJson() {
+    var output = new core.Map();
+
+    if (description != null) {
+      output["description"] = description;
+    }
+    if (id != null) {
+      output["id"] = id;
+    }
+    if (layerType != null) {
+      output["layerType"] = layerType;
+    }
+    if (name != null) {
+      output["name"] = name;
+    }
+    if (projectId != null) {
+      output["projectId"] = projectId;
+    }
+
+    return output;
+  }
+
+  /** Return String representation of PublishedLayer */
+  core.String toString() => JSON.encode(this.toJson());
+
+}
+
+/** The response returned by a call to layers.List.published. */
+class PublishedLayersListResponse {
+
+  /** Resources returned. */
+  core.List<PublishedLayer> layers;
+
+  /** Next page token. */
+  core.String nextPageToken;
+
+  /** Create new PublishedLayersListResponse from JSON data */
+  PublishedLayersListResponse.fromJson(core.Map json) {
+    if (json.containsKey("layers")) {
+      layers = json["layers"].map((layersItem) => new PublishedLayer.fromJson(layersItem)).toList();
+    }
+    if (json.containsKey("nextPageToken")) {
+      nextPageToken = json["nextPageToken"];
+    }
+  }
+
+  /** Create JSON Object for PublishedLayersListResponse */
+  core.Map toJson() {
+    var output = new core.Map();
+
+    if (layers != null) {
+      output["layers"] = layers.map((layersItem) => layersItem.toJson()).toList();
+    }
+    if (nextPageToken != null) {
+      output["nextPageToken"] = nextPageToken;
+    }
+
+    return output;
+  }
+
+  /** Return String representation of PublishedLayersListResponse */
+  core.String toString() => JSON.encode(this.toJson());
+
+}
+
+/** The published version of a map asset. */
+class PublishedMap {
+
+  /** The contents of this Map. */
+  MapContents contents;
+
+  /** An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees. */
+  LatLngBox defaultViewport;
+
+  /** The description of this Map, supplied by the author. */
+  core.String description;
+
+  /** A globally unique ID, used to refer to this Map. */
+  core.String id;
+
+  /** The name of this Map, supplied by the author. */
+  core.String name;
+
+  /** The ID of the project that this Map is in. */
+  core.String projectId;
+
+  /** Create new PublishedMap from JSON data */
+  PublishedMap.fromJson(core.Map json) {
+    if (json.containsKey("contents")) {
+      contents = new MapContents.fromJson(json["contents"]);
+    }
+    if (json.containsKey("defaultViewport")) {
+      defaultViewport = new LatLngBox.fromJson(json["defaultViewport"]);
+    }
+    if (json.containsKey("description")) {
+      description = json["description"];
+    }
+    if (json.containsKey("id")) {
+      id = json["id"];
+    }
+    if (json.containsKey("name")) {
+      name = json["name"];
+    }
+    if (json.containsKey("projectId")) {
+      projectId = json["projectId"];
+    }
+  }
+
+  /** Create JSON Object for PublishedMap */
+  core.Map toJson() {
+    var output = new core.Map();
+
+    if (contents != null) {
+      output["contents"] = contents.toJson();
+    }
+    if (defaultViewport != null) {
+      output["defaultViewport"] = defaultViewport.toJson();
+    }
+    if (description != null) {
+      output["description"] = description;
+    }
+    if (id != null) {
+      output["id"] = id;
+    }
+    if (name != null) {
+      output["name"] = name;
+    }
+    if (projectId != null) {
+      output["projectId"] = projectId;
+    }
+
+    return output;
+  }
+
+  /** Return String representation of PublishedMap */
+  core.String toString() => JSON.encode(this.toJson());
+
+}
+
+/** The response returned by a call to maps.List.published. */
+class PublishedMapsListResponse {
+
+  /** Resources returned. */
+  core.List<PublishedMap> maps;
+
+  /** Next page token. */
+  core.String nextPageToken;
+
+  /** Create new PublishedMapsListResponse from JSON data */
+  PublishedMapsListResponse.fromJson(core.Map json) {
+    if (json.containsKey("maps")) {
+      maps = json["maps"].map((mapsItem) => new PublishedMap.fromJson(mapsItem)).toList();
+    }
+    if (json.containsKey("nextPageToken")) {
+      nextPageToken = json["nextPageToken"];
+    }
+  }
+
+  /** Create JSON Object for PublishedMapsListResponse */
+  core.Map toJson() {
+    var output = new core.Map();
+
+    if (maps != null) {
+      output["maps"] = maps.map((mapsItem) => mapsItem.toJson()).toList();
+    }
+    if (nextPageToken != null) {
+      output["nextPageToken"] = nextPageToken;
+    }
+
+    return output;
+  }
+
+  /** Return String representation of PublishedMapsListResponse */
+  core.String toString() => JSON.encode(this.toJson());
+
+}
+
+/** A geo-referenced raster. */
 class Raster {
+
+  /** The acquisition time of this Raster. */
+  AcquisitionTime acquisitionTime;
+
+  /** The name of the attribution to be used for this Raster. */
+  core.String attribution;
+
+  /** A rectangular bounding box which contains all of the data in this Raster. The numbers represent latitude and longitude in decimal degrees. */
+  core.List<core.num> bbox;
+
+  /** The creation time of this raster. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). */
+  core.String creationTime;
+
+  /** The email address of the creator of this raster. This is only returned on GET requests and not LIST requests. */
+  core.String creatorEmail;
+
+  /** The description of this Raster, supplied by the author. */
+  core.String description;
+
+  /** Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. The API does not yet support the new permissions model. When you create a map via the API without specifying permissions, the account that created the map is the owner and has effective administrator access. Users can then use the Maps Engine user interface to adjust the permissions. This is a temporary workaround until the API supports the new permissions model. Read Add new users and groups in the Google Maps Engine help center for more information. */
+  core.String draftAccessList;
+
+  /** The ETag, used to refer to the current version of the asset. */
+  core.String etag;
+
+  /** The files associated with this Raster. */
+  core.List<File> files;
+
+  /** A globally unique ID, used to refer to this Raster. */
+  core.String id;
+
+  /** The last modified time of this raster. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). */
+  core.String lastModifiedTime;
+
+  /** The email address of the last modifier of this raster. This is only returned on GET requests and not LIST requests. */
+  core.String lastModifierEmail;
+
+  /** The mask processing type of this Raster. */
+  core.String maskType;
+
+  /** The name of this Raster, supplied by the author. */
+  core.String name;
+
+  /** The processing status of this Raster. */
+  core.String processingStatus;
+
+  /** The ID of the project that this Raster is in. */
+  core.String projectId;
+
+  /** The type of this Raster. Always "image" today. */
+  core.String rasterType;
+
+  /** Tags of this Raster. */
+  Tags tags;
+
+  /** Create new Raster from JSON data */
+  Raster.fromJson(core.Map json) {
+    if (json.containsKey("acquisitionTime")) {
+      acquisitionTime = new AcquisitionTime.fromJson(json["acquisitionTime"]);
+    }
+    if (json.containsKey("attribution")) {
+      attribution = json["attribution"];
+    }
+    if (json.containsKey("bbox")) {
+      bbox = json["bbox"].toList();
+    }
+    if (json.containsKey("creationTime")) {
+      creationTime = json["creationTime"];
+    }
+    if (json.containsKey("creatorEmail")) {
+      creatorEmail = json["creatorEmail"];
+    }
+    if (json.containsKey("description")) {
+      description = json["description"];
+    }
+    if (json.containsKey("draftAccessList")) {
+      draftAccessList = json["draftAccessList"];
+    }
+    if (json.containsKey("etag")) {
+      etag = json["etag"];
+    }
+    if (json.containsKey("files")) {
+      files = json["files"].map((filesItem) => new File.fromJson(filesItem)).toList();
+    }
+    if (json.containsKey("id")) {
+      id = json["id"];
+    }
+    if (json.containsKey("lastModifiedTime")) {
+      lastModifiedTime = json["lastModifiedTime"];
+    }
+    if (json.containsKey("lastModifierEmail")) {
+      lastModifierEmail = json["lastModifierEmail"];
+    }
+    if (json.containsKey("maskType")) {
+      maskType = json["maskType"];
+    }
+    if (json.containsKey("name")) {
+      name = json["name"];
+    }
+    if (json.containsKey("processingStatus")) {
+      processingStatus = json["processingStatus"];
+    }
+    if (json.containsKey("projectId")) {
+      projectId = json["projectId"];
+    }
+    if (json.containsKey("rasterType")) {
+      rasterType = json["rasterType"];
+    }
+    if (json.containsKey("tags")) {
+      tags = new Tags.fromJson(json["tags"]);
+    }
+  }
+
+  /** Create JSON Object for Raster */
+  core.Map toJson() {
+    var output = new core.Map();
+
+    if (acquisitionTime != null) {
+      output["acquisitionTime"] = acquisitionTime.toJson();
+    }
+    if (attribution != null) {
+      output["attribution"] = attribution;
+    }
+    if (bbox != null) {
+      output["bbox"] = bbox.toList();
+    }
+    if (creationTime != null) {
+      output["creationTime"] = creationTime;
+    }
+    if (creatorEmail != null) {
+      output["creatorEmail"] = creatorEmail;
+    }
+    if (description != null) {
+      output["description"] = description;
+    }
+    if (draftAccessList != null) {
+      output["draftAccessList"] = draftAccessList;
+    }
+    if (etag != null) {
+      output["etag"] = etag;
+    }
+    if (files != null) {
+      output["files"] = files.map((filesItem) => filesItem.toJson()).toList();
+    }
+    if (id != null) {
+      output["id"] = id;
+    }
+    if (lastModifiedTime != null) {
+      output["lastModifiedTime"] = lastModifiedTime;
+    }
+    if (lastModifierEmail != null) {
+      output["lastModifierEmail"] = lastModifierEmail;
+    }
+    if (maskType != null) {
+      output["maskType"] = maskType;
+    }
+    if (name != null) {
+      output["name"] = name;
+    }
+    if (processingStatus != null) {
+      output["processingStatus"] = processingStatus;
+    }
+    if (projectId != null) {
+      output["projectId"] = projectId;
+    }
+    if (rasterType != null) {
+      output["rasterType"] = rasterType;
+    }
+    if (tags != null) {
+      output["tags"] = tags.toJson();
+    }
+
+    return output;
+  }
+
+  /** Return String representation of Raster */
+  core.String toString() => JSON.encode(this.toJson());
+
+}
+
+/** A raster collection groups multiple Raster resources for inclusion in a Layer. */
+class RasterCollection {
+
+  /** The name of the attribution to be used for this RasterCollection. */
+  core.String attribution;
+
+  /** A rectangular bounding box which contains all of the data in this RasterCollection. The numbers represent latitude and longitude in decimal degrees. */
+  core.List<core.num> bbox;
+
+  /** The creation time of this RasterCollection. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). */
+  core.String creationTime;
+
+  /** The email address of the creator of this raster collection. This is only returned on GET requests and not LIST requests. */
+  core.String creatorEmail;
+
+  /** The description of this RasterCollection, supplied by the author. */
+  core.String description;
+
+  /** Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. The API does not yet support the new permissions model. When you create a map via the API without specifying permissions, the account that created the map is the owner and has effective administrator access. Users can then use the Maps Engine user interface to adjust the permissions. This is a temporary workaround until the API supports the new permissions model. Read Add new users and groups in the Google Maps Engine help center for more information. */
+  core.String draftAccessList;
+
+  /** The ETag, used to refer to the current version of the asset. */
+  core.String etag;
+
+  /** A globally unique ID, used to refer to this RasterCollection. */
+  core.String id;
+
+  /** The last modified time of this RasterCollection. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). */
+  core.String lastModifiedTime;
+
+  /** The email address of the last modifier of this raster collection. This is only returned on GET requests and not LIST requests. */
+  core.String lastModifierEmail;
+
+  /** True if this RasterCollection is a mosaic. */
+  core.bool mosaic;
+
+  /** The name of this RasterCollection, supplied by the author. */
+  core.String name;
+
+  /** The processing status of this RasterCollection. */
+  core.String processingStatus;
+
+  /** The ID of the project that this RasterCollection is in. */
+  core.String projectId;
+
+  /** The type of rasters contained within this RasterCollection. */
+  core.String rasterType;
+
+  /** Tags of this RasterCollection. */
+  Tags tags;
+
+  /** Create new RasterCollection from JSON data */
+  RasterCollection.fromJson(core.Map json) {
+    if (json.containsKey("attribution")) {
+      attribution = json["attribution"];
+    }
+    if (json.containsKey("bbox")) {
+      bbox = json["bbox"].toList();
+    }
+    if (json.containsKey("creationTime")) {
+      creationTime = json["creationTime"];
+    }
+    if (json.containsKey("creatorEmail")) {
+      creatorEmail = json["creatorEmail"];
+    }
+    if (json.containsKey("description")) {
+      description = json["description"];
+    }
+    if (json.containsKey("draftAccessList")) {
+      draftAccessList = json["draftAccessList"];
+    }
+    if (json.containsKey("etag")) {
+      etag = json["etag"];
+    }
+    if (json.containsKey("id")) {
+      id = json["id"];
+    }
+    if (json.containsKey("lastModifiedTime")) {
+      lastModifiedTime = json["lastModifiedTime"];
+    }
+    if (json.containsKey("lastModifierEmail")) {
+      lastModifierEmail = json["lastModifierEmail"];
+    }
+    if (json.containsKey("mosaic")) {
+      mosaic = json["mosaic"];
+    }
+    if (json.containsKey("name")) {
+      name = json["name"];
+    }
+    if (json.containsKey("processingStatus")) {
+      processingStatus = json["processingStatus"];
+    }
+    if (json.containsKey("projectId")) {
+      projectId = json["projectId"];
+    }
+    if (json.containsKey("rasterType")) {
+      rasterType = json["rasterType"];
+    }
+    if (json.containsKey("tags")) {
+      tags = new Tags.fromJson(json["tags"]);
+    }
+  }
+
+  /** Create JSON Object for RasterCollection */
+  core.Map toJson() {
+    var output = new core.Map();
+
+    if (attribution != null) {
+      output["attribution"] = attribution;
+    }
+    if (bbox != null) {
+      output["bbox"] = bbox.toList();
+    }
+    if (creationTime != null) {
+      output["creationTime"] = creationTime;
+    }
+    if (creatorEmail != null) {
+      output["creatorEmail"] = creatorEmail;
+    }
+    if (description != null) {
+      output["description"] = description;
+    }
+    if (draftAccessList != null) {
+      output["draftAccessList"] = draftAccessList;
+    }
+    if (etag != null) {
+      output["etag"] = etag;
+    }
+    if (id != null) {
+      output["id"] = id;
+    }
+    if (lastModifiedTime != null) {
+      output["lastModifiedTime"] = lastModifiedTime;
+    }
+    if (lastModifierEmail != null) {
+      output["lastModifierEmail"] = lastModifierEmail;
+    }
+    if (mosaic != null) {
+      output["mosaic"] = mosaic;
+    }
+    if (name != null) {
+      output["name"] = name;
+    }
+    if (processingStatus != null) {
+      output["processingStatus"] = processingStatus;
+    }
+    if (projectId != null) {
+      output["projectId"] = projectId;
+    }
+    if (rasterType != null) {
+      output["rasterType"] = rasterType;
+    }
+    if (tags != null) {
+      output["tags"] = tags.toJson();
+    }
+
+    return output;
+  }
+
+  /** Return String representation of RasterCollection */
+  core.String toString() => JSON.encode(this.toJson());
+
+}
+
+/** The response returned by a call to raster_collections.List. */
+class RasterCollectionsListResponse {
+
+  /** Next page token. */
+  core.String nextPageToken;
+
+  /** Resources returned. */
+  core.List<RasterCollection> rasterCollections;
+
+  /** Create new RasterCollectionsListResponse from JSON data */
+  RasterCollectionsListResponse.fromJson(core.Map json) {
+    if (json.containsKey("nextPageToken")) {
+      nextPageToken = json["nextPageToken"];
+    }
+    if (json.containsKey("rasterCollections")) {
+      rasterCollections = json["rasterCollections"].map((rasterCollectionsItem) => new RasterCollection.fromJson(rasterCollectionsItem)).toList();
+    }
+  }
+
+  /** Create JSON Object for RasterCollectionsListResponse */
+  core.Map toJson() {
+    var output = new core.Map();
+
+    if (nextPageToken != null) {
+      output["nextPageToken"] = nextPageToken;
+    }
+    if (rasterCollections != null) {
+      output["rasterCollections"] = rasterCollections.map((rasterCollectionsItem) => rasterCollectionsItem.toJson()).toList();
+    }
+
+    return output;
+  }
+
+  /** Return String representation of RasterCollectionsListResponse */
+  core.String toString() => JSON.encode(this.toJson());
+
+}
+
+/** A raster resource. */
+class RasterCollectionsRaster {
 
   /** A rectangular bounding box which contains all of the data in this Raster. The numbers represent latitude and longitude in decimal degrees. */
   core.List<core.num> bbox;
@@ -2277,8 +3011,8 @@ class Raster {
   /** Tags of this Raster. */
   core.List<core.String> tags;
 
-  /** Create new Raster from JSON data */
-  Raster.fromJson(core.Map json) {
+  /** Create new RasterCollectionsRaster from JSON data */
+  RasterCollectionsRaster.fromJson(core.Map json) {
     if (json.containsKey("bbox")) {
       bbox = json["bbox"].toList();
     }
@@ -2308,7 +3042,7 @@ class Raster {
     }
   }
 
-  /** Create JSON Object for Raster */
+  /** Create JSON Object for RasterCollectionsRaster */
   core.Map toJson() {
     var output = new core.Map();
 
@@ -2343,144 +3077,7 @@ class Raster {
     return output;
   }
 
-  /** Return String representation of Raster */
-  core.String toString() => JSON.encode(this.toJson());
-
-}
-
-/** A raster collection groups multiple Raster resources for inclusion in a Layer. */
-class RasterCollection {
-
-  /** The name of the attribution to be used for this RasterCollection. */
-  core.String attribution;
-
-  /** A rectangular bounding box which contains all of the data in this RasterCollection. The numbers represent latitude and longitude in decimal degrees. */
-  core.List<core.num> bbox;
-
-  /** The creation time of this RasterCollection. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). */
-  core.String creationTime;
-
-  /** The description of this RasterCollection, supplied by the author. */
-  core.String description;
-
-  /** The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Read About access lists in the Google Maps Engine help center for more information. */
-  core.String draftAccessList;
-
-  /** A globally unique ID, used to refer to this RasterCollection. */
-  core.String id;
-
-  /** The last modified time of this RasterCollection. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). */
-  core.String lastModifiedTime;
-
-  /** True if this RasterCollection is a mosaic. */
-  core.bool mosaic;
-
-  /** The name of this RasterCollection, supplied by the author. */
-  core.String name;
-
-  /** The processing status of this RasterCollection. */
-  core.String processingStatus;
-
-  /** The ID of the project that this RasterCollection is in. */
-  core.String projectId;
-
-  /** The type of rasters contained within this RasterCollection. */
-  core.String rasterType;
-
-  /** Tags of this RasterCollection. */
-  core.List<core.String> tags;
-
-  /** Create new RasterCollection from JSON data */
-  RasterCollection.fromJson(core.Map json) {
-    if (json.containsKey("attribution")) {
-      attribution = json["attribution"];
-    }
-    if (json.containsKey("bbox")) {
-      bbox = json["bbox"].toList();
-    }
-    if (json.containsKey("creationTime")) {
-      creationTime = json["creationTime"];
-    }
-    if (json.containsKey("description")) {
-      description = json["description"];
-    }
-    if (json.containsKey("draftAccessList")) {
-      draftAccessList = json["draftAccessList"];
-    }
-    if (json.containsKey("id")) {
-      id = json["id"];
-    }
-    if (json.containsKey("lastModifiedTime")) {
-      lastModifiedTime = json["lastModifiedTime"];
-    }
-    if (json.containsKey("mosaic")) {
-      mosaic = json["mosaic"];
-    }
-    if (json.containsKey("name")) {
-      name = json["name"];
-    }
-    if (json.containsKey("processingStatus")) {
-      processingStatus = json["processingStatus"];
-    }
-    if (json.containsKey("projectId")) {
-      projectId = json["projectId"];
-    }
-    if (json.containsKey("rasterType")) {
-      rasterType = json["rasterType"];
-    }
-    if (json.containsKey("tags")) {
-      tags = json["tags"].toList();
-    }
-  }
-
-  /** Create JSON Object for RasterCollection */
-  core.Map toJson() {
-    var output = new core.Map();
-
-    if (attribution != null) {
-      output["attribution"] = attribution;
-    }
-    if (bbox != null) {
-      output["bbox"] = bbox.toList();
-    }
-    if (creationTime != null) {
-      output["creationTime"] = creationTime;
-    }
-    if (description != null) {
-      output["description"] = description;
-    }
-    if (draftAccessList != null) {
-      output["draftAccessList"] = draftAccessList;
-    }
-    if (id != null) {
-      output["id"] = id;
-    }
-    if (lastModifiedTime != null) {
-      output["lastModifiedTime"] = lastModifiedTime;
-    }
-    if (mosaic != null) {
-      output["mosaic"] = mosaic;
-    }
-    if (name != null) {
-      output["name"] = name;
-    }
-    if (processingStatus != null) {
-      output["processingStatus"] = processingStatus;
-    }
-    if (projectId != null) {
-      output["projectId"] = projectId;
-    }
-    if (rasterType != null) {
-      output["rasterType"] = rasterType;
-    }
-    if (tags != null) {
-      output["tags"] = tags.toList();
-    }
-
-    return output;
-  }
-
-  /** Return String representation of RasterCollection */
+  /** Return String representation of RasterCollectionsRaster */
   core.String toString() => JSON.encode(this.toJson());
 
 }
@@ -2583,45 +3180,45 @@ class RasterCollectionsRastersBatchInsertResponse {
 
 }
 
-/** The response returned by a call to raster_collections.List. */
-class RastercollectionsListResponse {
+/** The response returned by a call to rasterCollections.rasters.List. */
+class RasterCollectionsRastersListResponse {
 
   /** Next page token. */
   core.String nextPageToken;
 
   /** Resources returned. */
-  core.List<RasterCollection> rasterCollections;
+  core.List<RasterCollectionsRaster> rasters;
 
-  /** Create new RastercollectionsListResponse from JSON data */
-  RastercollectionsListResponse.fromJson(core.Map json) {
+  /** Create new RasterCollectionsRastersListResponse from JSON data */
+  RasterCollectionsRastersListResponse.fromJson(core.Map json) {
     if (json.containsKey("nextPageToken")) {
       nextPageToken = json["nextPageToken"];
     }
-    if (json.containsKey("rasterCollections")) {
-      rasterCollections = json["rasterCollections"].map((rasterCollectionsItem) => new RasterCollection.fromJson(rasterCollectionsItem)).toList();
+    if (json.containsKey("rasters")) {
+      rasters = json["rasters"].map((rastersItem) => new RasterCollectionsRaster.fromJson(rastersItem)).toList();
     }
   }
 
-  /** Create JSON Object for RastercollectionsListResponse */
+  /** Create JSON Object for RasterCollectionsRastersListResponse */
   core.Map toJson() {
     var output = new core.Map();
 
     if (nextPageToken != null) {
       output["nextPageToken"] = nextPageToken;
     }
-    if (rasterCollections != null) {
-      output["rasterCollections"] = rasterCollections.map((rasterCollectionsItem) => rasterCollectionsItem.toJson()).toList();
+    if (rasters != null) {
+      output["rasters"] = rasters.map((rastersItem) => rastersItem.toJson()).toList();
     }
 
     return output;
   }
 
-  /** Return String representation of RastercollectionsListResponse */
+  /** Return String representation of RasterCollectionsRastersListResponse */
   core.String toString() => JSON.encode(this.toJson());
 
 }
 
-/** The response returned by a call to rasterCollections.rasters.List. */
+/** The response returned by a call to rasters.List. */
 class RastersListResponse {
 
   /** Next page token. */
@@ -2655,6 +3252,109 @@ class RastersListResponse {
   }
 
   /** Return String representation of RastersListResponse */
+  core.String toString() => JSON.encode(this.toJson());
+
+}
+
+/** Parameters for styling points as scaled shapes. */
+class ScaledShape {
+
+  /** Border color/width of the shape. If not specified the shape won't have a border. */
+  Border border;
+
+  /** The fill color of the shape. If not specified the shape will be transparent (although the borders may not be). */
+  Color fill;
+
+  /** Name of the shape. */
+  core.String shape;
+
+  /** Create new ScaledShape from JSON data */
+  ScaledShape.fromJson(core.Map json) {
+    if (json.containsKey("border")) {
+      border = new Border.fromJson(json["border"]);
+    }
+    if (json.containsKey("fill")) {
+      fill = new Color.fromJson(json["fill"]);
+    }
+    if (json.containsKey("shape")) {
+      shape = json["shape"];
+    }
+  }
+
+  /** Create JSON Object for ScaledShape */
+  core.Map toJson() {
+    var output = new core.Map();
+
+    if (border != null) {
+      output["border"] = border.toJson();
+    }
+    if (fill != null) {
+      output["fill"] = fill.toJson();
+    }
+    if (shape != null) {
+      output["shape"] = shape;
+    }
+
+    return output;
+  }
+
+  /** Return String representation of ScaledShape */
+  core.String toString() => JSON.encode(this.toJson());
+
+}
+
+/** Parameters for scaling scaled shapes. */
+class ScalingFunction {
+
+  /** Name of the numeric column used to scale a shape. */
+  core.String column;
+
+  /** The type of scaling function to use. Defaults to SQRT. Currently only linear and square root scaling are supported. */
+  core.String scalingType;
+
+  /** The range of shape sizes, in pixels. For circles, the size corresponds to the diameter. */
+  SizeRange sizeRange;
+
+  /** The range of values to display across the size range. */
+  ValueRange valueRange;
+
+  /** Create new ScalingFunction from JSON data */
+  ScalingFunction.fromJson(core.Map json) {
+    if (json.containsKey("column")) {
+      column = json["column"];
+    }
+    if (json.containsKey("scalingType")) {
+      scalingType = json["scalingType"];
+    }
+    if (json.containsKey("sizeRange")) {
+      sizeRange = new SizeRange.fromJson(json["sizeRange"]);
+    }
+    if (json.containsKey("valueRange")) {
+      valueRange = new ValueRange.fromJson(json["valueRange"]);
+    }
+  }
+
+  /** Create JSON Object for ScalingFunction */
+  core.Map toJson() {
+    var output = new core.Map();
+
+    if (column != null) {
+      output["column"] = column;
+    }
+    if (scalingType != null) {
+      output["scalingType"] = scalingType;
+    }
+    if (sizeRange != null) {
+      output["sizeRange"] = sizeRange.toJson();
+    }
+    if (valueRange != null) {
+      output["valueRange"] = valueRange.toJson();
+    }
+
+    return output;
+  }
+
+  /** Return String representation of ScalingFunction */
   core.String toString() => JSON.encode(this.toJson());
 
 }
@@ -2706,6 +3406,44 @@ class Schema {
 
 }
 
+/** Scaled shape size range in pixels. For circles, size corresponds to diameter. */
+class SizeRange {
+
+  /** Maximum size, in pixels. */
+  core.num max;
+
+  /** Minimum size, in pixels. */
+  core.num min;
+
+  /** Create new SizeRange from JSON data */
+  SizeRange.fromJson(core.Map json) {
+    if (json.containsKey("max")) {
+      max = json["max"];
+    }
+    if (json.containsKey("min")) {
+      min = json["min"];
+    }
+  }
+
+  /** Create JSON Object for SizeRange */
+  core.Map toJson() {
+    var output = new core.Map();
+
+    if (max != null) {
+      output["max"] = max;
+    }
+    if (min != null) {
+      output["min"] = min;
+    }
+
+    return output;
+  }
+
+  /** Return String representation of SizeRange */
+  core.String toString() => JSON.encode(this.toJson());
+
+}
+
 /** A collection of geographic features, and associated metadata. */
 class Table {
 
@@ -2715,11 +3453,17 @@ class Table {
   /** The creation time of this table. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). */
   core.String creationTime;
 
+  /** The email address of the creator of this table. This is only returned on GET requests and not LIST requests. */
+  core.String creatorEmail;
+
   /** The description of this table, supplied by the author. */
   core.String description;
 
-  /** The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Read About access lists in the Google Maps Engine help center for more information. */
+  /** Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. The API does not yet support the new permissions model. When you create a map via the API without specifying permissions, the account that created the map is the owner and has effective administrator access. Users can then use the Maps Engine user interface to adjust the permissions. This is a temporary workaround until the API supports the new permissions model. Read Add new users and groups in the Google Maps Engine help center for more information. */
   core.String draftAccessList;
+
+  /** The ETag, used to refer to the current version of the asset. */
+  core.String etag;
 
   /** The files associated with this table. */
   core.List<File> files;
@@ -2730,6 +3474,9 @@ class Table {
   /** The last modified time of this table. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). */
   core.String lastModifiedTime;
 
+  /** The email address of the last modifier of this table. This is only returned on GET requests and not LIST requests. */
+  core.String lastModifierEmail;
+
   /** The name of this table, supplied by the author. */
   core.String name;
 
@@ -2739,7 +3486,7 @@ class Table {
   /** The ID of the project to which the table belongs. */
   core.String projectId;
 
-  /** The access list to whom view permissions are granted. The value must be the name of a Maps Engine access list of the Map Viewer type, and the user must be a viewer on that list. Read About access lists in the Google Maps Engine help center for more information. */
+  /** Deprecated: The access list to whom view permissions are granted. The value must be the name of a Maps Engine access list of the Map Viewer type, and the user must be a viewer on that list. Read Share data, layers, and maps in the Google Maps Engine help center for more information. */
   core.String publishedAccessList;
 
   /** The schema for this table. */
@@ -2749,7 +3496,7 @@ class Table {
   core.String sourceEncoding;
 
   /** An array of text strings, with each string representing a tag. More information about tags can be found in the Tagging data article of the Maps Engine help center. */
-  core.List<core.String> tags;
+  Tags tags;
 
   /** Create new Table from JSON data */
   Table.fromJson(core.Map json) {
@@ -2759,11 +3506,17 @@ class Table {
     if (json.containsKey("creationTime")) {
       creationTime = json["creationTime"];
     }
+    if (json.containsKey("creatorEmail")) {
+      creatorEmail = json["creatorEmail"];
+    }
     if (json.containsKey("description")) {
       description = json["description"];
     }
     if (json.containsKey("draftAccessList")) {
       draftAccessList = json["draftAccessList"];
+    }
+    if (json.containsKey("etag")) {
+      etag = json["etag"];
     }
     if (json.containsKey("files")) {
       files = json["files"].map((filesItem) => new File.fromJson(filesItem)).toList();
@@ -2773,6 +3526,9 @@ class Table {
     }
     if (json.containsKey("lastModifiedTime")) {
       lastModifiedTime = json["lastModifiedTime"];
+    }
+    if (json.containsKey("lastModifierEmail")) {
+      lastModifierEmail = json["lastModifierEmail"];
     }
     if (json.containsKey("name")) {
       name = json["name"];
@@ -2793,7 +3549,7 @@ class Table {
       sourceEncoding = json["sourceEncoding"];
     }
     if (json.containsKey("tags")) {
-      tags = json["tags"].toList();
+      tags = new Tags.fromJson(json["tags"]);
     }
   }
 
@@ -2807,11 +3563,17 @@ class Table {
     if (creationTime != null) {
       output["creationTime"] = creationTime;
     }
+    if (creatorEmail != null) {
+      output["creatorEmail"] = creatorEmail;
+    }
     if (description != null) {
       output["description"] = description;
     }
     if (draftAccessList != null) {
       output["draftAccessList"] = draftAccessList;
+    }
+    if (etag != null) {
+      output["etag"] = etag;
     }
     if (files != null) {
       output["files"] = files.map((filesItem) => filesItem.toJson()).toList();
@@ -2821,6 +3583,9 @@ class Table {
     }
     if (lastModifiedTime != null) {
       output["lastModifiedTime"] = lastModifiedTime;
+    }
+    if (lastModifierEmail != null) {
+      output["lastModifierEmail"] = lastModifierEmail;
     }
     if (name != null) {
       output["name"] = name;
@@ -2841,7 +3606,7 @@ class Table {
       output["sourceEncoding"] = sourceEncoding;
     }
     if (tags != null) {
-      output["tags"] = tags.toList();
+      output["tags"] = tags.toJson();
     }
 
     return output;
@@ -2927,10 +3692,64 @@ class TablesListResponse {
 
 }
 
+class Tags extends SchemaArray<core.String> {
+
+  /** Create new Tags from JSON data */
+  Tags.fromJson(core.List json) {
+    innerList.addAll(json);
+  }
+
+  /** Create JSON Object for Tags */
+  core.List toJson() {
+    return innerList;
+  }
+
+  /** Return String representation of Tags */
+  core.String toString() => JSON.encode(this.toJson());
+
+}
+
+/** Range of values used for scaling shapes. The min/max values will be drawn as shapes with the min/max size. */
+class ValueRange {
+
+  /** Maximum value. */
+  core.num max;
+
+  /** Minimum value. */
+  core.num min;
+
+  /** Create new ValueRange from JSON data */
+  ValueRange.fromJson(core.Map json) {
+    if (json.containsKey("max")) {
+      max = json["max"];
+    }
+    if (json.containsKey("min")) {
+      min = json["min"];
+    }
+  }
+
+  /** Create JSON Object for ValueRange */
+  core.Map toJson() {
+    var output = new core.Map();
+
+    if (max != null) {
+      output["max"] = max;
+    }
+    if (min != null) {
+      output["min"] = min;
+    }
+
+    return output;
+  }
+
+  /** Return String representation of ValueRange */
+  core.String toString() => JSON.encode(this.toJson());
+
+}
+
 /** A vector style contains styling information for vector layer. */
 class VectorStyle {
 
-  /** Display rules of the vector style. The first matched rule will apply to the features. If no display rule is provided, a default display rule will be generated according to Geometry type. */
   core.List<DisplayRule> displayRules;
 
   /** Individual feature info, this is called Info Window in Maps Engine UI. If not provided, a default template with all attributes will be generated. */

@@ -64,16 +64,21 @@ class AssetsResource_ {
    *
    * [projectId] - The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
    *
-   * [type] - An asset type restriction. If set, only resources of this type will be returned.
+   * [role] - The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
    *   Allowed values:
-   *     layer - Return layers.
-   *     map - Return maps.
-   *     rasterCollection - Return raster collections.
-   *     table - Return tables.
+   *     owner - The user can read, write and administer the asset.
+   *     reader - The user can read the asset.
+   *     writer - The user can read and write the asset.
+   *
+   * [search] - An unstructured search string used to filter the set of results based on asset metadata.
+   *
+   * [tags] - A comma separated list of tags. Returned assets will contain all the tags from the list.
+   *
+   * [type] - A comma separated list of asset types. Returned assets will have one of the types from the provided list. Supported values are 'map', 'layer', 'rasterCollection' and 'table'.
    *
    * [optParams] - Additional query parameters
    */
-  async.Future<AssetsListResponse> list({core.String bbox, core.String createdAfter, core.String createdBefore, core.String creatorEmail, core.int maxResults, core.String modifiedAfter, core.String modifiedBefore, core.String pageToken, core.String projectId, core.String type, core.Map optParams}) {
+  async.Future<AssetsListResponse> list({core.String bbox, core.String createdAfter, core.String createdBefore, core.String creatorEmail, core.int maxResults, core.String modifiedAfter, core.String modifiedBefore, core.String pageToken, core.String projectId, core.String role, core.String search, core.String tags, core.String type, core.Map optParams}) {
     var url = "assets";
     var urlParams = new core.Map();
     var queryParams = new core.Map();
@@ -88,9 +93,12 @@ class AssetsResource_ {
     if (modifiedBefore != null) queryParams["modifiedBefore"] = modifiedBefore;
     if (pageToken != null) queryParams["pageToken"] = pageToken;
     if (projectId != null) queryParams["projectId"] = projectId;
-    if (type != null && !["layer", "map", "rasterCollection", "table"].contains(type)) {
-      paramErrors.add("Allowed values for type: layer, map, rasterCollection, table");
+    if (role != null && !["owner", "reader", "writer"].contains(role)) {
+      paramErrors.add("Allowed values for role: owner, reader, writer");
     }
+    if (role != null) queryParams["role"] = role;
+    if (search != null) queryParams["search"] = search;
+    if (tags != null) queryParams["tags"] = tags;
     if (type != null) queryParams["type"] = type;
     if (optParams != null) {
       optParams.forEach((key, value) {
@@ -169,6 +177,39 @@ class LayersResource_ {
       parents = new LayersParentsResource_(client);
 
   /**
+   * Cancel processing on a layer asset.
+   *
+   * [id] - The ID of the layer.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<ProcessResponse> cancelProcessing(core.String id, {core.Map optParams}) {
+    var url = "layers/{id}/cancelProcessing";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "POST", urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new ProcessResponse.fromJson(data));
+  }
+
+  /**
    * Create a layer asset.
    *
    * [request] - Layer to send in this request
@@ -200,6 +241,38 @@ class LayersResource_ {
     response = _client.request(url, "POST", body: request.toString(), urlParams: urlParams, queryParams: queryParams);
     return response
       .then((data) => new Layer.fromJson(data));
+  }
+
+  /**
+   * Delete a layer.
+   *
+   * [id] - The ID of the layer. Only the layer creator or project owner are permitted to delete. If the layer is published, or included in a map, the request will fail. Unpublish the layer, and remove it from all maps prior to deleting.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<core.Map> delete(core.String id, {core.Map optParams}) {
+    var url = "layers/{id}";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "DELETE", urlParams: urlParams, queryParams: queryParams);
+    return response;
   }
 
   /**
@@ -245,6 +318,39 @@ class LayersResource_ {
   }
 
   /**
+   * Return the published metadata for a particular layer.
+   *
+   * [id] - The ID of the layer.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<PublishedLayer> getPublished(core.String id, {core.Map optParams}) {
+    var url = "layers/{id}/published";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "GET", urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new PublishedLayer.fromJson(data));
+  }
+
+  /**
    * Return all layers readable by the current user.
    *
    * [bbox] - A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.
@@ -263,11 +369,29 @@ class LayersResource_ {
    *
    * [pageToken] - The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
    *
+   * [processingStatus]
+   *   Allowed values:
+   *     complete - The layer has completed processing.
+   *     failed - The layer has failed processing.
+   *     notReady - The layer is not ready for processing.
+   *     processing - The layer is processing.
+   *     ready - The layer is ready for processing.
+   *
    * [projectId] - The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
+   *
+   * [role] - The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
+   *   Allowed values:
+   *     owner - The user can read, write and administer the asset.
+   *     reader - The user can read the asset.
+   *     writer - The user can read and write the asset.
+   *
+   * [search] - An unstructured search string used to filter the set of results based on asset metadata.
+   *
+   * [tags] - A comma separated list of tags. Returned assets will contain all the tags from the list.
    *
    * [optParams] - Additional query parameters
    */
-  async.Future<LayersListResponse> list({core.String bbox, core.String createdAfter, core.String createdBefore, core.String creatorEmail, core.int maxResults, core.String modifiedAfter, core.String modifiedBefore, core.String pageToken, core.String projectId, core.Map optParams}) {
+  async.Future<LayersListResponse> list({core.String bbox, core.String createdAfter, core.String createdBefore, core.String creatorEmail, core.int maxResults, core.String modifiedAfter, core.String modifiedBefore, core.String pageToken, core.String processingStatus, core.String projectId, core.String role, core.String search, core.String tags, core.Map optParams}) {
     var url = "layers";
     var urlParams = new core.Map();
     var queryParams = new core.Map();
@@ -280,6 +404,54 @@ class LayersResource_ {
     if (maxResults != null) queryParams["maxResults"] = maxResults;
     if (modifiedAfter != null) queryParams["modifiedAfter"] = modifiedAfter;
     if (modifiedBefore != null) queryParams["modifiedBefore"] = modifiedBefore;
+    if (pageToken != null) queryParams["pageToken"] = pageToken;
+    if (processingStatus != null && !["complete", "failed", "notReady", "processing", "ready"].contains(processingStatus)) {
+      paramErrors.add("Allowed values for processingStatus: complete, failed, notReady, processing, ready");
+    }
+    if (processingStatus != null) queryParams["processingStatus"] = processingStatus;
+    if (projectId != null) queryParams["projectId"] = projectId;
+    if (role != null && !["owner", "reader", "writer"].contains(role)) {
+      paramErrors.add("Allowed values for role: owner, reader, writer");
+    }
+    if (role != null) queryParams["role"] = role;
+    if (search != null) queryParams["search"] = search;
+    if (tags != null) queryParams["tags"] = tags;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "GET", urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new LayersListResponse.fromJson(data));
+  }
+
+  /**
+   * Return all published layers readable by the current user.
+   *
+   * [maxResults] - The maximum number of items to include in a single response page. The maximum supported value is 100.
+   *
+   * [pageToken] - The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
+   *
+   * [projectId] - The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<PublishedLayersListResponse> listPublished({core.int maxResults, core.String pageToken, core.String projectId, core.Map optParams}) {
+    var url = "layers/published";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (maxResults != null) queryParams["maxResults"] = maxResults;
     if (pageToken != null) queryParams["pageToken"] = pageToken;
     if (projectId != null) queryParams["projectId"] = projectId;
     if (optParams != null) {
@@ -297,7 +469,41 @@ class LayersResource_ {
     var response;
     response = _client.request(url, "GET", urlParams: urlParams, queryParams: queryParams);
     return response
-      .then((data) => new LayersListResponse.fromJson(data));
+      .then((data) => new PublishedLayersListResponse.fromJson(data));
+  }
+
+  /**
+   * Mutate a layer asset.
+   *
+   * [request] - Layer to send in this request
+   *
+   * [id] - The ID of the layer.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<core.Map> patch(Layer request, core.String id, {core.Map optParams}) {
+    var url = "layers/{id}";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "PATCH", body: request.toString(), urlParams: urlParams, queryParams: queryParams);
+    return response;
   }
 
   /**
@@ -338,10 +544,46 @@ class LayersResource_ {
    *
    * [id] - The ID of the layer.
    *
+   * [force] - If set to true, the API will allow publication of the layer even if it's out of date. If not true, you'll need to reprocess any out-of-date layer before publishing.
+   *
    * [optParams] - Additional query parameters
    */
-  async.Future<PublishResponse> publish(core.String id, {core.Map optParams}) {
+  async.Future<PublishResponse> publish(core.String id, {core.bool force, core.Map optParams}) {
     var url = "layers/{id}/publish";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (force != null) queryParams["force"] = force;
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "POST", urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new PublishResponse.fromJson(data));
+  }
+
+  /**
+   * Unpublish a layer asset.
+   *
+   * [id] - The ID of the layer.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<PublishResponse> unpublish(core.String id, {core.Map optParams}) {
+    var url = "layers/{id}/unpublish";
     var urlParams = new core.Map();
     var queryParams = new core.Map();
 
@@ -453,11 +695,43 @@ class MapsResource_ {
   }
 
   /**
+   * Delete a map.
+   *
+   * [id] - The ID of the map. Only the map creator or project owner are permitted to delete. If the map is published the request will fail. Unpublish the map prior to deleting.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<core.Map> delete(core.String id, {core.Map optParams}) {
+    var url = "maps/{id}";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "DELETE", urlParams: urlParams, queryParams: queryParams);
+    return response;
+  }
+
+  /**
    * Return metadata for a particular map.
    *
    * [id] - The ID of the map.
    *
-   * [version]
+   * [version] - Deprecated: The version parameter indicates which version of the map should be returned. When version is set to published, the published version of the map will be returned. Please use the maps.getPublished endpoint instead.
    *   Allowed values:
    *     draft - The draft version.
    *     published - The published version.
@@ -495,6 +769,39 @@ class MapsResource_ {
   }
 
   /**
+   * Return the published metadata for a particular map.
+   *
+   * [id] - The ID of the map.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<PublishedMap> getPublished(core.String id, {core.Map optParams}) {
+    var url = "maps/{id}/published";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "GET", urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new PublishedMap.fromJson(data));
+  }
+
+  /**
    * Return all maps readable by the current user.
    *
    * [bbox] - A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.
@@ -513,11 +820,28 @@ class MapsResource_ {
    *
    * [pageToken] - The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
    *
+   * [processingStatus]
+   *   Allowed values:
+   *     complete - The map has completed processing.
+   *     failed - The map has failed processing.
+   *     notReady - The map is not ready for processing.
+   *     processing - The map is processing.
+   *
    * [projectId] - The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
+   *
+   * [role] - The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
+   *   Allowed values:
+   *     owner - The user can read, write and administer the asset.
+   *     reader - The user can read the asset.
+   *     writer - The user can read and write the asset.
+   *
+   * [search] - An unstructured search string used to filter the set of results based on asset metadata.
+   *
+   * [tags] - A comma separated list of tags. Returned assets will contain all the tags from the list.
    *
    * [optParams] - Additional query parameters
    */
-  async.Future<MapsListResponse> list({core.String bbox, core.String createdAfter, core.String createdBefore, core.String creatorEmail, core.int maxResults, core.String modifiedAfter, core.String modifiedBefore, core.String pageToken, core.String projectId, core.Map optParams}) {
+  async.Future<MapsListResponse> list({core.String bbox, core.String createdAfter, core.String createdBefore, core.String creatorEmail, core.int maxResults, core.String modifiedAfter, core.String modifiedBefore, core.String pageToken, core.String processingStatus, core.String projectId, core.String role, core.String search, core.String tags, core.Map optParams}) {
     var url = "maps";
     var urlParams = new core.Map();
     var queryParams = new core.Map();
@@ -531,7 +855,17 @@ class MapsResource_ {
     if (modifiedAfter != null) queryParams["modifiedAfter"] = modifiedAfter;
     if (modifiedBefore != null) queryParams["modifiedBefore"] = modifiedBefore;
     if (pageToken != null) queryParams["pageToken"] = pageToken;
+    if (processingStatus != null && !["complete", "failed", "notReady", "processing"].contains(processingStatus)) {
+      paramErrors.add("Allowed values for processingStatus: complete, failed, notReady, processing");
+    }
+    if (processingStatus != null) queryParams["processingStatus"] = processingStatus;
     if (projectId != null) queryParams["projectId"] = projectId;
+    if (role != null && !["owner", "reader", "writer"].contains(role)) {
+      paramErrors.add("Allowed values for role: owner, reader, writer");
+    }
+    if (role != null) queryParams["role"] = role;
+    if (search != null) queryParams["search"] = search;
+    if (tags != null) queryParams["tags"] = tags;
     if (optParams != null) {
       optParams.forEach((key, value) {
         if (value != null && queryParams[key] == null) {
@@ -551,14 +885,122 @@ class MapsResource_ {
   }
 
   /**
-   * Publish a map asset.
+   * Return all published maps readable by the current user.
+   *
+   * [maxResults] - The maximum number of items to include in a single response page. The maximum supported value is 100.
+   *
+   * [pageToken] - The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
+   *
+   * [projectId] - The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<PublishedMapsListResponse> listPublished({core.int maxResults, core.String pageToken, core.String projectId, core.Map optParams}) {
+    var url = "maps/published";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (maxResults != null) queryParams["maxResults"] = maxResults;
+    if (pageToken != null) queryParams["pageToken"] = pageToken;
+    if (projectId != null) queryParams["projectId"] = projectId;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "GET", urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new PublishedMapsListResponse.fromJson(data));
+  }
+
+  /**
+   * Mutate a map asset.
+   *
+   * [request] - Map to send in this request
    *
    * [id] - The ID of the map.
    *
    * [optParams] - Additional query parameters
    */
-  async.Future<PublishResponse> publish(core.String id, {core.Map optParams}) {
+  async.Future<core.Map> patch(Map request, core.String id, {core.Map optParams}) {
+    var url = "maps/{id}";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "PATCH", body: request.toString(), urlParams: urlParams, queryParams: queryParams);
+    return response;
+  }
+
+  /**
+   * Publish a map asset.
+   *
+   * [id] - The ID of the map.
+   *
+   * [force] - If set to true, the API will allow publication of the map even if it's out of date. If false, the map must have a processingStatus of complete before publishing.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<PublishResponse> publish(core.String id, {core.bool force, core.Map optParams}) {
     var url = "maps/{id}/publish";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (force != null) queryParams["force"] = force;
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "POST", urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new PublishResponse.fromJson(data));
+  }
+
+  /**
+   * Unpublish a map asset.
+   *
+   * [id] - The ID of the map.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<PublishResponse> unpublish(core.String id, {core.Map optParams}) {
+    var url = "maps/{id}/unpublish";
     var urlParams = new core.Map();
     var queryParams = new core.Map();
 
@@ -588,8 +1030,11 @@ class ProjectsResource_ {
 
   final Client _client;
 
+  final ProjectsIconsResource_ icons;
+
   ProjectsResource_(Client client) :
-      _client = client;
+      _client = client,
+      icons = new ProjectsIconsResource_(client);
 
   /**
    * Return all projects readable by the current user.
@@ -621,6 +1066,134 @@ class ProjectsResource_ {
   }
 }
 
+class ProjectsIconsResource_ {
+
+  final Client _client;
+
+  ProjectsIconsResource_(Client client) :
+      _client = client;
+
+  /**
+   * Create an icon.
+   *
+   * [request] - Icon to send in this request
+   *
+   * [projectId] - The ID of the project.
+   *
+   * [content] - Base64 Data of the file content to be uploaded
+   *
+   * [contentType] - MimeType of the file to be uploaded
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<Icon> create(Icon request, core.String projectId, {core.String content, core.String contentType, core.Map optParams}) {
+    var url = "projects/{projectId}/icons";
+    var uploadUrl = "/upload/mapsengine/v1/projects/{projectId}/icons";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (projectId == null) paramErrors.add("projectId is required");
+    if (projectId != null) urlParams["projectId"] = projectId;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    if (content != null) {
+      response = _client.upload(uploadUrl, "POST", request.toString(), content, contentType, urlParams: urlParams, queryParams: queryParams);
+    } else {
+      response = _client.request(url, "POST", body: request.toString(), urlParams: urlParams, queryParams: queryParams);
+    }
+    return response
+      .then((data) => new Icon.fromJson(data));
+  }
+
+  /**
+   * Return an icon or its associated metadata
+   *
+   * [projectId] - The ID of the project.
+   *
+   * [id] - The ID of the icon.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<Icon> get(core.String projectId, core.String id, {core.Map optParams}) {
+    var url = "projects/{projectId}/icons/{id}";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (projectId == null) paramErrors.add("projectId is required");
+    if (projectId != null) urlParams["projectId"] = projectId;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "GET", urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new Icon.fromJson(data));
+  }
+
+  /**
+   * Return all icons in the current project
+   *
+   * [projectId] - The ID of the project.
+   *
+   * [maxResults] - The maximum number of items to include in a single response page. The maximum supported value is 50.
+   *
+   * [pageToken] - The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<IconsListResponse> list(core.String projectId, {core.int maxResults, core.String pageToken, core.Map optParams}) {
+    var url = "projects/{projectId}/icons";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (maxResults != null) queryParams["maxResults"] = maxResults;
+    if (pageToken != null) queryParams["pageToken"] = pageToken;
+    if (projectId == null) paramErrors.add("projectId is required");
+    if (projectId != null) urlParams["projectId"] = projectId;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "GET", urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new IconsListResponse.fromJson(data));
+  }
+}
+
 class RasterCollectionsResource_ {
 
   final Client _client;
@@ -632,6 +1205,39 @@ class RasterCollectionsResource_ {
       _client = client,
       parents = new RasterCollectionsParentsResource_(client),
       rasters = new RasterCollectionsRastersResource_(client);
+
+  /**
+   * Cancel processing on a raster collection asset.
+   *
+   * [id] - The ID of the raster collection.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<ProcessResponse> cancelProcessing(core.String id, {core.Map optParams}) {
+    var url = "rasterCollections/{id}/cancelProcessing";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "POST", urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new ProcessResponse.fromJson(data));
+  }
 
   /**
    * Create a raster collection asset.
@@ -662,6 +1268,38 @@ class RasterCollectionsResource_ {
     response = _client.request(url, "POST", body: request.toString(), urlParams: urlParams, queryParams: queryParams);
     return response
       .then((data) => new RasterCollection.fromJson(data));
+  }
+
+  /**
+   * Delete a raster collection.
+   *
+   * [id] - The ID of the raster collection. Only the raster collection creator or project owner are permitted to delete. If the rastor collection is included in a layer, the request will fail. Remove the raster collection from all layers prior to deleting.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<core.Map> delete(core.String id, {core.Map optParams}) {
+    var url = "rasterCollections/{id}";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "DELETE", urlParams: urlParams, queryParams: queryParams);
+    return response;
   }
 
   /**
@@ -716,11 +1354,29 @@ class RasterCollectionsResource_ {
    *
    * [pageToken] - The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
    *
+   * [processingStatus]
+   *   Allowed values:
+   *     complete - The raster collection has completed processing.
+   *     failed - The raster collection has failed processing.
+   *     notReady - The raster collection is not ready for processing.
+   *     processing - The raster collection is processing.
+   *     ready - The raster collection is ready for processing.
+   *
    * [projectId] - The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
+   *
+   * [role] - The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
+   *   Allowed values:
+   *     owner - The user can read, write and administer the asset.
+   *     reader - The user can read the asset.
+   *     writer - The user can read and write the asset.
+   *
+   * [search] - An unstructured search string used to filter the set of results based on asset metadata.
+   *
+   * [tags] - A comma separated list of tags. Returned assets will contain all the tags from the list.
    *
    * [optParams] - Additional query parameters
    */
-  async.Future<RastercollectionsListResponse> list({core.String bbox, core.String createdAfter, core.String createdBefore, core.String creatorEmail, core.int maxResults, core.String modifiedAfter, core.String modifiedBefore, core.String pageToken, core.String projectId, core.Map optParams}) {
+  async.Future<RasterCollectionsListResponse> list({core.String bbox, core.String createdAfter, core.String createdBefore, core.String creatorEmail, core.int maxResults, core.String modifiedAfter, core.String modifiedBefore, core.String pageToken, core.String processingStatus, core.String projectId, core.String role, core.String search, core.String tags, core.Map optParams}) {
     var url = "rasterCollections";
     var urlParams = new core.Map();
     var queryParams = new core.Map();
@@ -734,7 +1390,17 @@ class RasterCollectionsResource_ {
     if (modifiedAfter != null) queryParams["modifiedAfter"] = modifiedAfter;
     if (modifiedBefore != null) queryParams["modifiedBefore"] = modifiedBefore;
     if (pageToken != null) queryParams["pageToken"] = pageToken;
+    if (processingStatus != null && !["complete", "failed", "notReady", "processing", "ready"].contains(processingStatus)) {
+      paramErrors.add("Allowed values for processingStatus: complete, failed, notReady, processing, ready");
+    }
+    if (processingStatus != null) queryParams["processingStatus"] = processingStatus;
     if (projectId != null) queryParams["projectId"] = projectId;
+    if (role != null && !["owner", "reader", "writer"].contains(role)) {
+      paramErrors.add("Allowed values for role: owner, reader, writer");
+    }
+    if (role != null) queryParams["role"] = role;
+    if (search != null) queryParams["search"] = search;
+    if (tags != null) queryParams["tags"] = tags;
     if (optParams != null) {
       optParams.forEach((key, value) {
         if (value != null && queryParams[key] == null) {
@@ -750,7 +1416,41 @@ class RasterCollectionsResource_ {
     var response;
     response = _client.request(url, "GET", urlParams: urlParams, queryParams: queryParams);
     return response
-      .then((data) => new RastercollectionsListResponse.fromJson(data));
+      .then((data) => new RasterCollectionsListResponse.fromJson(data));
+  }
+
+  /**
+   * Mutate a raster collection asset.
+   *
+   * [request] - RasterCollection to send in this request
+   *
+   * [id] - The ID of the raster collection.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<core.Map> patch(RasterCollection request, core.String id, {core.Map optParams}) {
+    var url = "rasterCollections/{id}";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "PATCH", body: request.toString(), urlParams: urlParams, queryParams: queryParams);
+    return response;
   }
 
   /**
@@ -936,9 +1636,19 @@ Up to 50 rasters can be included in a single batchInsert request. Each batchInse
    *
    * [pageToken] - The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
    *
+   * [role] - The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
+   *   Allowed values:
+   *     owner - The user can read, write and administer the asset.
+   *     reader - The user can read the asset.
+   *     writer - The user can read and write the asset.
+   *
+   * [search] - An unstructured search string used to filter the set of results based on asset metadata.
+   *
+   * [tags] - A comma separated list of tags. Returned assets will contain all the tags from the list.
+   *
    * [optParams] - Additional query parameters
    */
-  async.Future<RastersListResponse> list(core.String id, {core.String bbox, core.String createdAfter, core.String createdBefore, core.String creatorEmail, core.int maxResults, core.String modifiedAfter, core.String modifiedBefore, core.String pageToken, core.Map optParams}) {
+  async.Future<RasterCollectionsRastersListResponse> list(core.String id, {core.String bbox, core.String createdAfter, core.String createdBefore, core.String creatorEmail, core.int maxResults, core.String modifiedAfter, core.String modifiedBefore, core.String pageToken, core.String role, core.String search, core.String tags, core.Map optParams}) {
     var url = "rasterCollections/{id}/rasters";
     var urlParams = new core.Map();
     var queryParams = new core.Map();
@@ -954,6 +1664,12 @@ Up to 50 rasters can be included in a single batchInsert request. Each batchInse
     if (modifiedAfter != null) queryParams["modifiedAfter"] = modifiedAfter;
     if (modifiedBefore != null) queryParams["modifiedBefore"] = modifiedBefore;
     if (pageToken != null) queryParams["pageToken"] = pageToken;
+    if (role != null && !["owner", "reader", "writer"].contains(role)) {
+      paramErrors.add("Allowed values for role: owner, reader, writer");
+    }
+    if (role != null) queryParams["role"] = role;
+    if (search != null) queryParams["search"] = search;
+    if (tags != null) queryParams["tags"] = tags;
     if (optParams != null) {
       optParams.forEach((key, value) {
         if (value != null && queryParams[key] == null) {
@@ -969,7 +1685,7 @@ Up to 50 rasters can be included in a single batchInsert request. Each batchInse
     var response;
     response = _client.request(url, "GET", urlParams: urlParams, queryParams: queryParams);
     return response
-      .then((data) => new RastersListResponse.fromJson(data));
+      .then((data) => new RasterCollectionsRastersListResponse.fromJson(data));
   }
 }
 
@@ -986,13 +1702,45 @@ class RastersResource_ {
       parents = new RastersParentsResource_(client);
 
   /**
+   * Delete a raster.
+   *
+   * [id] - The ID of the raster. Only the raster creator or project owner are permitted to delete. If the raster is included in a layer or mosaic, the request will fail. Remove it from all parents prior to deleting.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<core.Map> delete(core.String id, {core.Map optParams}) {
+    var url = "rasters/{id}";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "DELETE", urlParams: urlParams, queryParams: queryParams);
+    return response;
+  }
+
+  /**
    * Return metadata for a single raster.
    *
    * [id] - The ID of the raster.
    *
    * [optParams] - Additional query parameters
    */
-  async.Future<Image> get(core.String id, {core.Map optParams}) {
+  async.Future<Raster> get(core.String id, {core.Map optParams}) {
     var url = "rasters/{id}";
     var urlParams = new core.Map();
     var queryParams = new core.Map();
@@ -1015,17 +1763,169 @@ class RastersResource_ {
     var response;
     response = _client.request(url, "GET", urlParams: urlParams, queryParams: queryParams);
     return response
-      .then((data) => new Image.fromJson(data));
+      .then((data) => new Raster.fromJson(data));
+  }
+
+  /**
+   * Return all rasters readable by the current user.
+   *
+   * [projectId] - The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
+   *
+   * [bbox] - A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.
+   *
+   * [createdAfter] - An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.
+   *
+   * [createdBefore] - An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.
+   *
+   * [creatorEmail] - An email address representing a user. Returned assets that have been created by the user associated with the provided email address.
+   *
+   * [maxResults] - The maximum number of items to include in a single response page. The maximum supported value is 100.
+   *
+   * [modifiedAfter] - An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.
+   *
+   * [modifiedBefore] - An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.
+   *
+   * [pageToken] - The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
+   *
+   * [processingStatus]
+   *   Allowed values:
+   *     complete - The raster has completed processing.
+   *     failed - The raster has failed processing.
+   *     notReady - The raster is not ready for processing.
+   *     processing - The raster is processing.
+   *     ready - The raster is ready for processing.
+   *
+   * [role] - The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
+   *   Allowed values:
+   *     owner - The user can read, write and administer the asset.
+   *     reader - The user can read the asset.
+   *     writer - The user can read and write the asset.
+   *
+   * [search] - An unstructured search string used to filter the set of results based on asset metadata.
+   *
+   * [tags] - A comma separated list of tags. Returned assets will contain all the tags from the list.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<RastersListResponse> list(core.String projectId, {core.String bbox, core.String createdAfter, core.String createdBefore, core.String creatorEmail, core.int maxResults, core.String modifiedAfter, core.String modifiedBefore, core.String pageToken, core.String processingStatus, core.String role, core.String search, core.String tags, core.Map optParams}) {
+    var url = "rasters";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (bbox != null) queryParams["bbox"] = bbox;
+    if (createdAfter != null) queryParams["createdAfter"] = createdAfter;
+    if (createdBefore != null) queryParams["createdBefore"] = createdBefore;
+    if (creatorEmail != null) queryParams["creatorEmail"] = creatorEmail;
+    if (maxResults != null) queryParams["maxResults"] = maxResults;
+    if (modifiedAfter != null) queryParams["modifiedAfter"] = modifiedAfter;
+    if (modifiedBefore != null) queryParams["modifiedBefore"] = modifiedBefore;
+    if (pageToken != null) queryParams["pageToken"] = pageToken;
+    if (processingStatus != null && !["complete", "failed", "notReady", "processing", "ready"].contains(processingStatus)) {
+      paramErrors.add("Allowed values for processingStatus: complete, failed, notReady, processing, ready");
+    }
+    if (processingStatus != null) queryParams["processingStatus"] = processingStatus;
+    if (projectId == null) paramErrors.add("projectId is required");
+    if (projectId != null) queryParams["projectId"] = projectId;
+    if (role != null && !["owner", "reader", "writer"].contains(role)) {
+      paramErrors.add("Allowed values for role: owner, reader, writer");
+    }
+    if (role != null) queryParams["role"] = role;
+    if (search != null) queryParams["search"] = search;
+    if (tags != null) queryParams["tags"] = tags;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "GET", urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new RastersListResponse.fromJson(data));
+  }
+
+  /**
+   * Mutate a raster asset.
+   *
+   * [request] - Raster to send in this request
+   *
+   * [id] - The ID of the raster.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<core.Map> patch(Raster request, core.String id, {core.Map optParams}) {
+    var url = "rasters/{id}";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "PATCH", body: request.toString(), urlParams: urlParams, queryParams: queryParams);
+    return response;
+  }
+
+  /**
+   * Process a raster asset.
+   *
+   * [id] - The ID of the raster.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<ProcessResponse> process(core.String id, {core.Map optParams}) {
+    var url = "rasters/{id}/process";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "POST", urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new ProcessResponse.fromJson(data));
   }
 
   /**
    * Create a skeleton raster asset for upload.
    *
-   * [request] - Image to send in this request
+   * [request] - Raster to send in this request
    *
    * [optParams] - Additional query parameters
    */
-  async.Future<Image> upload(Image request, {core.Map optParams}) {
+  async.Future<Raster> upload(Raster request, {core.Map optParams}) {
     var url = "rasters/upload";
     var urlParams = new core.Map();
     var queryParams = new core.Map();
@@ -1046,7 +1946,7 @@ class RastersResource_ {
     var response;
     response = _client.request(url, "POST", body: request.toString(), urlParams: urlParams, queryParams: queryParams);
     return response
-      .then((data) => new Image.fromJson(data));
+      .then((data) => new Raster.fromJson(data));
   }
 }
 
@@ -1196,6 +2096,38 @@ class TablesResource_ {
   }
 
   /**
+   * Delete a table.
+   *
+   * [id] - The ID of the table. Only the table creator or project owner are permitted to delete. If the table is included in a layer, the request will fail. Remove it from all layers prior to deleting.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<core.Map> delete(core.String id, {core.Map optParams}) {
+    var url = "tables/{id}";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "DELETE", urlParams: urlParams, queryParams: queryParams);
+    return response;
+  }
+
+  /**
    * Return metadata for a particular table, including the schema.
    *
    * [id] - The ID of the table.
@@ -1256,11 +2188,29 @@ class TablesResource_ {
    *
    * [pageToken] - The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
    *
+   * [processingStatus]
+   *   Allowed values:
+   *     complete - The table has completed processing.
+   *     failed - The table has failed processing.
+   *     notReady - The table is not ready for processing.
+   *     processing - The table is processing.
+   *     ready - The table is ready for processing.
+   *
    * [projectId] - The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
+   *
+   * [role] - The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
+   *   Allowed values:
+   *     owner - The user can read, write and administer the asset.
+   *     reader - The user can read the asset.
+   *     writer - The user can read and write the asset.
+   *
+   * [search] - An unstructured search string used to filter the set of results based on asset metadata.
+   *
+   * [tags] - A comma separated list of tags. Returned assets will contain all the tags from the list.
    *
    * [optParams] - Additional query parameters
    */
-  async.Future<TablesListResponse> list({core.String bbox, core.String createdAfter, core.String createdBefore, core.String creatorEmail, core.int maxResults, core.String modifiedAfter, core.String modifiedBefore, core.String pageToken, core.String projectId, core.Map optParams}) {
+  async.Future<TablesListResponse> list({core.String bbox, core.String createdAfter, core.String createdBefore, core.String creatorEmail, core.int maxResults, core.String modifiedAfter, core.String modifiedBefore, core.String pageToken, core.String processingStatus, core.String projectId, core.String role, core.String search, core.String tags, core.Map optParams}) {
     var url = "tables";
     var urlParams = new core.Map();
     var queryParams = new core.Map();
@@ -1274,7 +2224,17 @@ class TablesResource_ {
     if (modifiedAfter != null) queryParams["modifiedAfter"] = modifiedAfter;
     if (modifiedBefore != null) queryParams["modifiedBefore"] = modifiedBefore;
     if (pageToken != null) queryParams["pageToken"] = pageToken;
+    if (processingStatus != null && !["complete", "failed", "notReady", "processing", "ready"].contains(processingStatus)) {
+      paramErrors.add("Allowed values for processingStatus: complete, failed, notReady, processing, ready");
+    }
+    if (processingStatus != null) queryParams["processingStatus"] = processingStatus;
     if (projectId != null) queryParams["projectId"] = projectId;
+    if (role != null && !["owner", "reader", "writer"].contains(role)) {
+      paramErrors.add("Allowed values for role: owner, reader, writer");
+    }
+    if (role != null) queryParams["role"] = role;
+    if (search != null) queryParams["search"] = search;
+    if (tags != null) queryParams["tags"] = tags;
     if (optParams != null) {
       optParams.forEach((key, value) {
         if (value != null && queryParams[key] == null) {
@@ -1291,6 +2251,73 @@ class TablesResource_ {
     response = _client.request(url, "GET", urlParams: urlParams, queryParams: queryParams);
     return response
       .then((data) => new TablesListResponse.fromJson(data));
+  }
+
+  /**
+   * Mutate a table asset.
+   *
+   * [request] - Table to send in this request
+   *
+   * [id] - The ID of the table.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<core.Map> patch(Table request, core.String id, {core.Map optParams}) {
+    var url = "tables/{id}";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "PATCH", body: request.toString(), urlParams: urlParams, queryParams: queryParams);
+    return response;
+  }
+
+  /**
+   * Process a table asset.
+   *
+   * [id] - The ID of the table.
+   *
+   * [optParams] - Additional query parameters
+   */
+  async.Future<ProcessResponse> process(core.String id, {core.Map optParams}) {
+    var url = "tables/{id}/process";
+    var urlParams = new core.Map();
+    var queryParams = new core.Map();
+
+    var paramErrors = new core.List();
+    if (id == null) paramErrors.add("id is required");
+    if (id != null) urlParams["id"] = id;
+    if (optParams != null) {
+      optParams.forEach((key, value) {
+        if (value != null && queryParams[key] == null) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    if (!paramErrors.isEmpty) {
+      throw new core.ArgumentError(paramErrors.join(" / "));
+    }
+
+    var response;
+    response = _client.request(url, "POST", urlParams: urlParams, queryParams: queryParams);
+    return response
+      .then((data) => new ProcessResponse.fromJson(data));
   }
 
   /**
@@ -1518,7 +2545,7 @@ For more information about updating features, read Updating features in the Goog
    *
    * [limit] - The total number of features to return from the query, irrespective of the number of pages.
    *
-   * [maxResults] - The maximum number of items to include in the response, used for paging.
+   * [maxResults] - The maximum number of items to include in the response, used for paging. The maximum supported value is 1000.
    *
    * [orderBy] - An SQL-like order by clause used to sort results. If this parameter is not included, the order of features is undefined.
    *
